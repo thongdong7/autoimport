@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`scanSourceDir could scan dir 1`] = `
+Object {
+  "./A": Object {
+    "main": "A",
+    "others": Array [
+      "x",
+    ],
+    "types": Array [],
+  },
+  "./B": Object {
+    "main": "B",
+    "others": Array [],
+    "types": Array [],
+  },
+  "./B/CNoDefault": Object {
+    "others": Array [
+      "C",
+    ],
+    "types": Array [],
+  },
+  "./B/types": Object {
+    "others": Array [],
+    "types": Array [
+      "TUser",
+    ],
+  },
+}
+`;
+
+exports[`scanSourceDir could scan dir 2`] = `
+Object {
+  "./A": Object {
+    "main": "A",
+    "others": Array [
+      "x",
+    ],
+    "types": Array [],
+  },
+  "./B": Object {
+    "main": "B",
+    "others": Array [],
+    "types": Array [],
+  },
+  "./B/CNoDefault": Object {
+    "others": Array [
+      "C",
+    ],
+    "types": Array [],
+  },
+  "./B/types": Object {
+    "others": Array [],
+    "types": Array [
+      "TUser",
+    ],
+  },
+}
+`;

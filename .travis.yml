@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - "node"
+  - "lts/*"
+
+cache:
+  directories:
+    - "packages/core/node_modules"
+
+before_script:
+  - cd packages/core
+  - yarn
+script: ./bin/test.sh

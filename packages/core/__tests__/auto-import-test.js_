@@ -1,0 +1,16 @@
+jest.autoMockOff();
+const defineTest = require("jscodeshift/dist/testUtils").defineTest;
+
+const prefixs = [
+  // x
+  "common",
+  "builtin-global",
+  "jsx",
+  // "jsx-flow",
+  "react-class",
+  "func",
+];
+for (const prefix of prefixs) {
+  defineTest(__dirname, "test-auto-import", null, `${prefix}`);
+}
+// defineTest(__dirname, "test-auto-import", null, "auto-import-jsx");

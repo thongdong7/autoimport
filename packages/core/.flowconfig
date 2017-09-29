@@ -1,0 +1,17 @@
+[ignore]
+<PROJECT_ROOT>/__testfixtures__
+<PROJECT_ROOT>/node_modules
+<PROJECT_ROOT>/lib
+.*/node_modules/.*
+
+[include]
+
+[libs]
+flow-typed
+
+[lints]
+all=warn
+
+[options]
+all=true
+include_warnings=true

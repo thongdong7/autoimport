@@ -1,0 +1,6 @@
+test
+lib
+node_modules
+*.vsix
+/packages/sample
+/.idea

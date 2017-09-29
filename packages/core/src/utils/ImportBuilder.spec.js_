@@ -1,0 +1,50 @@
+// import { getImportBuilder } from "./ImportBuilder";
+import { scanSourceDir } from "./BuildSourceConfig";
+import Config from "../Config";
+import type { TNormalizedOptions } from "../types";
+import path from "path";
+
+const projectPath = path.join(__dirname, "../../__testfixtures__/sample2");
+const rootPath = "";
+const { value: packages, type: types } = scanSourceDir(
+  path.join(projectPath, rootPath)
+);
+const options: TNormalizedOptions = {
+  packages: {
+    "react-dom": {
+      main: "ReactDOM",
+    },
+    ...packages,
+  },
+  types,
+  // sources: {
+  //   "addons/PropsTransform": {
+  //     main: "PropsTransform",
+  //   },
+  //   "modules/ModuleB/ModuleB": {
+  //     main: "ModuleB",
+  //   },
+  // },
+  memberFolders: [],
+  rootPath,
+  projectPath,
+};
+
+test("Resolve import path", () => {
+  const config = new Config(options);
+  const getImport = getImportBuilder(config);
+  const currentFilePath = "modules/ModuleA/ModuleAUtils.js";
+
+  expect(getImport(currentFilePath, "ReactDOM")).toEqual({
+    defaultImport: true,
+    path: "react-dom",
+  });
+  expect(getImport(currentFilePath, "PropsTransform")).toEqual({
+    defaultImport: true,
+    path: "../../addons/PropsTransform",
+  });
+  expect(getImport(currentFilePath, "ModuleB")).toEqual({
+    defaultImport: true,
+    path: "../ModuleB/ModuleB",
+  });
+});

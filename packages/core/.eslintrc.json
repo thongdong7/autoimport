@@ -1,0 +1,41 @@
+{
+  "extends": "react-app",
+  "globals": {
+    "removeCodeIndent": true
+  },
+  "plugins": [],
+  "rules": {
+    "camelcase": [
+      "error",
+      {
+        "properties": "always"
+      }
+    ],
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "exports": "always-multiline",
+        "imports": "always-multiline",
+        "objects": "always-multiline"
+      }
+    ],
+    "no-console": "error",
+    "no-unused-vars": [
+      "error"
+    ],
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        "block": {
+          "balanced": true
+        },
+        "exceptions": [
+          "-",
+          "*"
+        ]
+      }
+    ]
+  }
+}
