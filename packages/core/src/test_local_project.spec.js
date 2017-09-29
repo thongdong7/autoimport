@@ -30,7 +30,7 @@ describe.skip("Real project", () => {
   function fixture(projectPath) {
     const configProvider = new ConfigProvider();
 
-    const optionsFile = path.join(projectPath, "autoimport.json");
+    // const optionsFile = path.join(projectPath, "autoimport.json");
     const cacheFile = path.join(projectPath, "autoimport.json.cache");
 
     if (fs.existsSync(cacheFile)) {
@@ -68,11 +68,11 @@ describe.skip("Real project", () => {
       .readFileSync(failFile)
       .toString("utf-8")
       .trim();
-    if (content != "") {
+    if (content !== "") {
       failedCases = content.split("\n");
     }
   }
-  console.log(failedCases);
+  // console.log(failedCases);
   for (const f of _getFiles(projectPath + "/src")) {
     if (!f.endsWith(".js")) {
       continue;
@@ -107,7 +107,7 @@ describe.skip("Real project", () => {
       return { imported: spec.imported.name, local: spec.local.name };
     }
 
-    console.log("spec", JSON.stringify(spec, null, 2));
+    // console.log("spec", JSON.stringify(spec, null, 2));
 
     return spec;
   }
@@ -180,7 +180,7 @@ describe.skip("Real project", () => {
       const ast = j(source);
       // console.log("ast", ast);
 
-      const [imports, rawImports] = _getImports(ast);
+      const [imports] = _getImports(ast);
       // console.log("imports", JSON.stringify(imports, null, 2));
       // console.log("a", rawImports);
       // Remove import with specifiers.length > 0

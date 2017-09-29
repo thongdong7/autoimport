@@ -59,9 +59,15 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
 
   constructor() {
     // Load options
+    this.configProvider = new ConfigProvider();
+
+    this.loadConfig();
+    // console.log("pp", projectPaths);
+  }
+
+  loadConfig = () => {
     console.time("load config");
     addToOutput("Load config");
-    this.configProvider = new ConfigProvider();
     const workspaceFolders = workspace.workspaceFolders || [];
     const projectPaths = workspaceFolders
       .filter(item => item.uri.scheme === "file")
@@ -69,8 +75,7 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
     this.configProvider.updateProjectPaths(projectPaths);
     console.timeEnd("load config");
     addToOutput("All config is loaded");
-    // console.log("pp", projectPaths);
-  }
+  };
 
   updateOptionFile = (file: string) => {
     addToOutput("Update option file");

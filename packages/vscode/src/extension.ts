@@ -11,8 +11,12 @@ import {
 } from "vscode";
 import * as path from "path";
 import EditProvider from "./AutoImportEditProvider";
-import * as fs from 'fs';
-import { setupChannel, setupErrorHandler, registerDisposables } from './errorHandler';
+import * as fs from "fs";
+import {
+  setupChannel,
+  setupErrorHandler,
+  registerDisposables
+} from "./errorHandler";
 
 export function activate(context: ExtensionContext) {
   setupChannel();
@@ -29,12 +33,13 @@ export function activate(context: ExtensionContext) {
   optionFileWatcher.onDidChange(optionFileUpdate);
 
   // Watch js files
-  let jsFileWatcher = workspace.createFileSystemWatcher(
-    "**/**/*.js"
-  );
+  let jsFileWatcher = workspace.createFileSystemWatcher("**/**/*.js");
   let jsFileUpdate = async (e: Uri) => {
-    console.log('js file change1', e.fsPath);
-    editProvider.configProvider.addFile(e.fsPath, fs.readFileSync(e.fsPath).toString());
+    console.log("js file change1", e.fsPath);
+    editProvider.configProvider.addFile(
+      e.fsPath,
+      fs.readFileSync(e.fsPath).toString()
+    );
   };
   jsFileWatcher.onDidChange(jsFileUpdate);
 
@@ -46,13 +51,23 @@ export function activate(context: ExtensionContext) {
   //         _registeredProviders[modeId].dispose();
   //     }
   // });
+  var disposable = commands.registerCommand(
+    "extension.autoimportRescan",
+    () => {
+      editProvider.loadConfig();
+    }
+  );
 
   context.subscriptions.push(
-    languages.registerDocumentFormattingEditProvider("javascript", editProvider),
+    languages.registerDocumentFormattingEditProvider(
+      "javascript",
+      editProvider
+    ),
     setupErrorHandler(),
-    ...registerDisposables()
+    ...registerDisposables(),
+    disposable
   );
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {}
