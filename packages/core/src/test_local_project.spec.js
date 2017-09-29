@@ -26,7 +26,7 @@ function* _getFiles(dir: string) {
   }
 }
 
-describe("Real project", () => {
+describe.skip("Real project", () => {
   function fixture(projectPath) {
     const configProvider = new ConfigProvider();
 
@@ -45,7 +45,7 @@ describe("Real project", () => {
       formatFile(f: string): string {
         return configProvider.formatFile(
           f,
-          fs.readFileSync(f).toString("utf-8")
+          fs.readFileSync(f).toString("utf-8"),
         );
       },
     };
@@ -188,7 +188,7 @@ describe("Real project", () => {
         .find(j.ImportDeclaration)
         .filter(
           p =>
-            p.node.specifiers.length > 0 && p.node.source.value.startsWith(".")
+            p.node.specifiers.length > 0 && p.node.source.value.startsWith("."),
         )
         .remove()
         .toSource();
@@ -240,7 +240,7 @@ describe("Real project", () => {
         fs.writeFileSync(sampleDir + "/" + outputFile, newSource2);
         fs.writeFileSync(
           sampleDir + "/" + fileName.replace(".js", ".diff.json"),
-          JSON.stringify(importDiff(imports, imports2), null, 2)
+          JSON.stringify(importDiff(imports, imports2), null, 2),
         );
 
         fs.appendFileSync(failFile, fullPath + "\n");

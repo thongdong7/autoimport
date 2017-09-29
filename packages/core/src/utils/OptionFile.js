@@ -14,6 +14,7 @@ export const initNormalizedOptions: TNormalizedOptions = {
   rootPath: "",
   projectPath: "",
   memberFolders: [],
+  ignore: [],
 };
 
 function _diffObject(oldObject = {}, newObject = {}): TOptionPackageDiff {
@@ -40,7 +41,7 @@ function _diffObject(oldObject = {}, newObject = {}): TOptionPackageDiff {
 
 export function diffOptions(
   oldOptions: TOptionsForDiff,
-  newOptions: TOptionsForDiff
+  newOptions: TOptionsForDiff,
 ): TOptionDiff {
   return {
     packages: _diffObject(oldOptions.packages, newOptions.packages),
