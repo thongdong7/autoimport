@@ -86,7 +86,7 @@ describe("ConfigProvider", () => {
       "types.js",
       `
     export type TName = string;
-    `
+    `,
     );
 
     return tool;
@@ -160,7 +160,7 @@ ReactDOM1.render();
         rootPath: "",
         ignore: ["Abc"],
       },
-      { notify: true }
+      { notify: true },
     );
 
     tool.format("const x1 = Abc;").is("const x1 = Abc;");
@@ -234,7 +234,7 @@ const A: TName = "abc";
       `
 const y = X;
     `,
-      "d1/d2/d3/Y.js"
+      "d1/d2/d3/Y.js",
     ).is(`
 import { X } from "./X";
 const y = X;
@@ -251,7 +251,7 @@ const y = X;
       `
 const y = X;
         `,
-      "d1/d2/d3/Y.js"
+      "d1/d2/d3/Y.js",
     ).is(`
 import { X } from "./X";
 const y = X;
@@ -266,7 +266,7 @@ const y = X;
       `
 const Hello = () => <div>Hello</div>;
         `,
-      "Hello.js"
+      "Hello.js",
     ).is(`
 import React from "react";
 const Hello = () => <div>Hello</div>;
@@ -285,7 +285,7 @@ const Hello = () => <div>Hello</div>;
       `
 const b = A;
         `,
-      "src/d1/e1/e2/e3/B.js"
+      "src/d1/e1/e2/e3/B.js",
     ).is(`
 import { A } from "../../../d2/A";
 const b = A;
@@ -301,7 +301,7 @@ const b = A;
       `
 import React from "react";
 class A extends Component {}
-      `
+      `,
     ).is(`
 import React, { Component } from "react";
 class A extends Component {}
@@ -312,7 +312,7 @@ class A extends Component {}
       `
 import { Component } from "react";
 const A = () => <div>a</div>;
-      `
+      `,
     ).is(`
 import React, { Component } from "react";
 const A = () => <div>a</div>;
@@ -332,7 +332,7 @@ export const A = 1;
 export const B = 2;
 export const X = 2;
 export default "hello";
-      `
+      `,
     );
     tool.format(
       `
@@ -341,7 +341,7 @@ export default "hello";
       import { A } from "./C";
       const x = B;
       const y: TName = C;
-      `
+      `,
     ).is(`
       import C, { A, B, X } from "./C";
       import type { TAge, TName } from "./C";
@@ -360,7 +360,7 @@ export default "hello";
       `
       // @flow
       const b = A;`,
-      "B.js"
+      "B.js",
     ).is(`
       // @flow
       import { A } from "./A";
@@ -377,7 +377,7 @@ export default "hello";
       // @flow
       import React from 'react';
       const b = 1;`,
-      "B.js"
+      "B.js",
     ).is(`
       // @flow
       import React from 'react';
@@ -393,7 +393,7 @@ export default "hello";
       // @flow
       import React from 'react';
       class A extends Component {}`,
-      "B.js"
+      "B.js",
     ).is(`
       // @flow
       import React, { Component } from "react";
@@ -410,7 +410,7 @@ export default "hello";
       import A from "./A";
       import React from "react";
       `,
-      "B.js"
+      "B.js",
     ).is(`
       // @flow
       import React from "react";
@@ -444,7 +444,7 @@ export default "hello";
       export default class Z extends Component {
 
       }
-    `
+    `,
     );
 
     tool.format(`
@@ -500,7 +500,7 @@ export default "hello";
       export default class Z extends Component {
 
       }
-    `
+    `,
     );
 
     tool.format(`
@@ -525,6 +525,26 @@ export default "hello";
           </div>
         )
       }
+    `);
+  });
+
+  it("support disable autoimport", () => {
+    const tool = fixture();
+    tool.startWithoutOptionFile();
+
+    tool.writeFile(
+      "A.js",
+      `
+      export default 1;
+    `,
+    );
+
+    tool.format(`
+      // autoimport-disable
+      const b = A;
+    `).is(`
+      // autoimport-disable
+      const b = A;
     `);
   });
 });
@@ -610,7 +630,7 @@ describe("ConfigProvider cache", () => {
       "types.js",
       `
     export type TName = string;
-    `
+    `,
     );
 
     tool.startWithoutOptionFile();
@@ -626,7 +646,7 @@ describe("ConfigProvider cache", () => {
       projectPath + "/a.js",
       `
 const a: TName = "abc";
-    `
+    `,
     );
     // console.log(text);
     expect(text).toContain(`import type { TName } from "./types";`);

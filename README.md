@@ -11,6 +11,29 @@
 * Auto Import undefined identifiers from installed dependencies and source code
 * Support ES module import and Flow import
 * Sort imports
+* Disable autoimport for file: `// autoimport-disable`
+
+Sample config file (`autoimport.json`)
+
+```json
+{
+  "packages": {
+    "react": {
+      "main": "React",
+      "others": [
+        "Component"
+      ]
+    },
+    "react-dom": {
+      "main": "ReactDOM"
+    }
+  },
+  "ignore": [
+    "window", "document", "JSON"
+  ],
+  "rootPath": ""
+}
+```
 
 # Usage
 
