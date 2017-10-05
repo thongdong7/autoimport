@@ -264,12 +264,41 @@ const y = X;
 
     tool.format(
       `
-const Hello = () => <div>Hello</div>;
+        const Hello = () => <div>Hello</div>;
+        ReactDOM.render(<Hello />);
         `,
       "Hello.js",
     ).is(`
-import React from "react";
-const Hello = () => <div>Hello</div>;
+      import React from "react";
+      import ReactDOM from "react-dom";
+      const Hello = () => <div>Hello</div>;
+      ReactDOM.render(<Hello />);
+        `);
+  });
+
+  it("could import React when Component is imported before", () => {
+    const tool = fixture();
+    tool.startWithoutOptionFile();
+
+    tool.format(
+      `
+        import { Component } from "react";
+
+        class A extends Component {
+          render() {
+            return <div>hello</div>;
+          }
+        }
+        `,
+      "Hello.js",
+    ).is(`
+        import React, { Component } from "react";
+    
+        class A extends Component {
+          render() {
+            return <div>hello</div>;
+          }
+        }
         `);
   });
 
