@@ -64,6 +64,14 @@ export class ProjectConfigProvider {
     return cp;
   }
 
+  getAutoImportStatus = () => {
+    return {
+      hasJSONConfigFile: true,
+
+      ...this.config.getStats(),
+    };
+  };
+
   _buildText2Text = () => {
     const jscodeshift = prepareJscodeshift({
       parser: "flow",
@@ -235,6 +243,10 @@ export default class ConfigProvider {
       projectPath =>
         new ProjectConfigProvider(path.join(projectPath, "autoimport.json")),
     );
+  };
+
+  getAutoImportStatus = () => {
+    return this.projectConfigs.map(pc => pc.getAutoImportStatus());
   };
 
   fromCache = (projectPaths: string[]) => {

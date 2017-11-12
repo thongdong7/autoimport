@@ -9,6 +9,22 @@ import type {
 } from "./types";
 import fs from "fs";
 import path from "path";
+import { flatMap } from "lodash";
+
+function _getNodeModulesForMemberFolder(detectFolder, memberFolder): string {
+  const fullMemberFolder = path.join(
+    detectFolder,
+    "node_modules",
+    memberFolder,
+  );
+
+  if (!fs.existsSync(fullMemberFolder)) {
+    // TODO Show a warning or watch this folder to load again when memberFolder available
+    return "";
+  }
+
+  return fullMemberFolder;
+}
 
 export default class Config {
   options: TNormalizedOptions;
@@ -43,6 +59,13 @@ export default class Config {
 
     return c;
   }
+
+  getStats = () => {
+    return {
+      numberIdentifiers: Object.keys(this._memberMap).length,
+      memberFolders: this._getFullMemberFolders(),
+    };
+  };
 
   getCache = () => {
     return {
@@ -102,7 +125,7 @@ export default class Config {
     // console.log("p", p, this.packages);
     const tmp = this._getMemberInfosFromImportInfo(
       package_,
-      this.packages[package_]
+      this.packages[package_],
     );
     // console.log("tmp", tmp);
     for (const member of Object.keys(tmp)) {
@@ -128,7 +151,7 @@ export default class Config {
 
   applyPackagesDiff = (
     packages: TPackagesOption,
-    { removed, added, replaced }: TOptionPackageDiff
+    { removed, added, replaced }: TOptionPackageDiff,
   ) => {
     // Remove packages
     removed.forEach(this._removePackage);
@@ -146,19 +169,29 @@ export default class Config {
     added.forEach(p => this._addPackage(p, packages[p]));
   };
 
-  loadMemberFolders = () => {
-    for (const memberFolder of this.options.memberFolders || []) {
-      const fullMemberFolder = path.join(
+  _getFullMemberFolders = () => {
+    // $FlowFixMe
+    return flatMap(this.options.memberFolders || [], memberFolder => {
+      const detectFolders = [
         this.projectPath,
-        "node_modules",
-        memberFolder
-      );
+        path.join(this.projectPath, path.dirname(this.rootPath)),
+        path.join(this.projectPath, this.rootPath),
+      ];
+      // console.log(detectFolders);
+      const fullMemberFolders = detectFolders
+        .map(detectFolder =>
+          _getNodeModulesForMemberFolder(detectFolder, memberFolder),
+        )
+        .filter(f => f !== "");
 
-      if (!fs.existsSync(fullMemberFolder)) {
-        // TODO Show a warning or watch this folder to load again when memberFolder available
-        continue;
-      }
+      // console.log(fullMemberFolders);
 
+      return fullMemberFolders;
+    });
+  };
+
+  loadMemberFolders = () => {
+    for (const fullMemberFolder of this._getFullMemberFolders()) {
       const memberNames = fs
         .readdirSync(fullMemberFolder)
         .filter(item => item.endsWith(".js"))
@@ -168,7 +201,7 @@ export default class Config {
         // autoDetectMembers[member] = memberFolder + "/" + member;
         // Only update if member is not exists
         this._updateMemberInfoIfNotExists(member, {
-          path: memberFolder + "/" + member,
+          path: fullMemberFolder + "/" + member,
           // TODO verify it
           defaultImport: true,
           package: true,

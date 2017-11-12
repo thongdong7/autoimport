@@ -23,3 +23,7 @@ TBD
 # Credit
 
 This extension inspired by Prettier extension. A lot of code is copied from that.
+
+# TODO
+
+* Support alias config in autoimport.json (import {A as B} from "C")

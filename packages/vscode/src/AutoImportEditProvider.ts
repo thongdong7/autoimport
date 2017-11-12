@@ -5,7 +5,7 @@ import {
   CancellationToken,
   TextEdit,
   Range,
-  workspace
+  workspace,
 } from "vscode";
 import ConfigProvider from "autoimport/lib/ConfigProvider";
 import { safeExecution, addToOutput } from "./errorHandler";
@@ -15,7 +15,7 @@ import { requireLocalPkg } from "./requirePkg";
 // TODO Fix this
 const prettierOptions = {
   trailingComma: "es5",
-  parser: "flow"
+  parser: "flow",
 };
 
 function fullDocumentRange(document: TextDocument): Range {
@@ -33,7 +33,7 @@ function format(
   configProvider: ConfigProvider,
   text: string,
   { fileName, languageId }: TextDocument,
-  customOptions: object
+  customOptions: object,
 ): string {
   console.log("call format", fileName);
 
@@ -72,9 +72,21 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
     const projectPaths = workspaceFolders
       .filter(item => item.uri.scheme === "file")
       .map(item => item.uri.fsPath);
+
     this.configProvider.updateProjectPaths(projectPaths);
+    const results = this.configProvider.getAutoImportStatus();
+
+    const output = results
+      .map(
+        ({ hasJSONConfigFile, memberFolders, numberIdentifiers }) =>
+          `JSONConfig: ${hasJSONConfigFile}\nmemberFolders: ${memberFolders.join(
+            "\n",
+          )}\nIdentifiers: ${numberIdentifiers}`,
+      )
+      .join("\n");
+
     console.timeEnd("load config");
-    addToOutput("All config is loaded");
+    addToOutput(`All config is loaded: ${output}`);
   };
 
   updateOptionFile = (file: string) => {
@@ -82,20 +94,16 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
     this.configProvider.updateOptionFile(file);
   };
 
-  // loadOptions() {
-
-  // }
-
   provideDocumentFormattingEdits(
     document: TextDocument,
     options: FormattingOptions,
-    token: CancellationToken
+    token: CancellationToken,
   ): TextEdit[] {
     return [
       TextEdit.replace(
         fullDocumentRange(document),
-        format(this.configProvider, document.getText(), document, {})
-      )
+        format(this.configProvider, document.getText(), document, {}),
+      ),
     ];
   }
 }
