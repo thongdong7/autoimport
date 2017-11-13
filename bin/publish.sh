@@ -18,6 +18,7 @@ lerna bootstrap
 
 echo Compile to ES5
 cd packages/core
+yarn
 yarn run compile
 cd ../..
 
