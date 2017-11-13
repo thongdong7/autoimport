@@ -211,12 +211,15 @@ export default class Config {
 
       // console.log(fullMemberFolders);
 
-      return fullMemberFolders;
+      return fullMemberFolders.map(f => [f, memberFolder]);
     });
   };
 
   loadMemberFolders = () => {
-    for (const fullMemberFolder of this._getFullMemberFolders()) {
+    for (const [
+      fullMemberFolder,
+      memberFolder,
+    ] of this._getFullMemberFolders()) {
       const memberNames = fs
         .readdirSync(fullMemberFolder)
         .filter(item => item.endsWith(".js"))
@@ -226,7 +229,7 @@ export default class Config {
         // autoDetectMembers[member] = memberFolder + "/" + member;
         // Only update if member is not exists
         this._updateMemberInfoIfNotExists(member, {
-          path: fullMemberFolder + "/" + member,
+          path: memberFolder + "/" + member,
           // TODO verify it
           defaultImport: true,
           package: true,
