@@ -11,6 +11,25 @@ import fs from "fs";
 import path from "path";
 import { flatMap } from "lodash";
 
+const _parseIdentifierNameOfOtherPattern = new RegExp(
+  "^(\\S+)\\s+as\\s+(\\S+)$",
+);
+export function parseIdentifierNameOfOther(otherStr: string) {
+  const result = _parseIdentifierNameOfOtherPattern.exec(otherStr);
+
+  if (result == null) {
+    return {
+      memberName: otherStr,
+      memberAlias: otherStr,
+    };
+  } else {
+    return {
+      memberAlias: result[2],
+      memberName: result[1],
+    };
+  }
+}
+
 function _getNodeModulesForMemberFolder(detectFolder, memberFolder): string {
   const fullMemberFolder = path.join(
     detectFolder,
@@ -103,11 +122,17 @@ export default class Config {
     }
 
     for (const member of info.others || []) {
-      ret[member] = {
+      const { memberName, memberAlias } = parseIdentifierNameOfOther(member);
+
+      ret[memberAlias] = {
         path,
         defaultImport: false,
         exportKind: "value",
       };
+
+      if (memberName !== memberAlias) {
+        ret[memberAlias].actualName = memberName;
+      }
     }
 
     for (const member of info.types || []) {

@@ -142,6 +142,25 @@ ReactDOM1.render();
         `);
   });
 
+  it("could support alias", () => {
+    const tool = fixture();
+    const options1 = {
+      packages: {
+        antd: {
+          others: ["Switch as UISwitch"],
+        },
+      },
+      rootPath: "",
+    };
+    tool.start(options1);
+
+    // Format with ReactDOM1
+    tool.format(`console.log(UISwitch);`).is(`
+import { Switch as UISwitch } from "antd";
+console.log(UISwitch);
+    `);
+  });
+
   it("support ignore custom global identifiers", () => {
     const tool = fixture();
     const options1 = {

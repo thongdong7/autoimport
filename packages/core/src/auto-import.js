@@ -15,7 +15,7 @@ const baseTransform = (
   api: TAPI,
   rootPath: string,
   _getImport: TGetImport,
-  _getImportType: TGetImport
+  _getImportType: TGetImport,
 ): string => {
   // console.log("rp", rootPath, file.path);
   const j = api.jscodeshift;
@@ -49,7 +49,7 @@ const baseTransform = (
       return;
     }
 
-    const { exportKind, path: path_ } = importInfo;
+    const { exportKind, path: path_, actualName } = importInfo;
 
     if (!importMap[exportKind]) {
       importMap[exportKind] = {};
@@ -67,7 +67,9 @@ const baseTransform = (
     if (importInfo.defaultImport) {
       mapKind[path_].main = identifier;
     } else {
-      mapKind[path_].others = [...mapKind[path_].others, identifier];
+      const identifier_ =
+        actualName != null ? `${actualName} as ${identifier}` : identifier;
+      mapKind[path_].others = [...mapKind[path_].others, identifier_];
     }
   });
 
@@ -80,7 +82,7 @@ const baseTransform = (
   while (true) {
     const result2 = result.replace(
       /(import[^\n]+from[^\n]+)\n{2,}import/g,
-      "$1\nimport"
+      "$1\nimport",
     );
     if (result2 === result) {
       break;
@@ -95,13 +97,13 @@ const baseTransform = (
 export const transformByConfigProvider = (
   file: TFile,
   api: TAPI,
-  configProvider: ProjectConfigProvider
+  configProvider: ProjectConfigProvider,
 ) => {
   return baseTransform(
     file,
     api,
     configProvider.getFullRootPath(),
     configProvider.getImport,
-    configProvider.getImport
+    configProvider.getImport,
   );
 };
