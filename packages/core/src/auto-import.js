@@ -4,9 +4,6 @@ import getUndefinedIndentifiers from "./DetectUndefinedIdentifier";
 import { ProjectConfigProvider } from "./ConfigProvider";
 import path from "path";
 import { updateImport } from "./utils/ImportUtils";
-import chalk from "chalk";
-
-const error = chalk.red;
 
 type TGetImport = (fileRelative: string, member: string) => ?TMemberInfo;
 

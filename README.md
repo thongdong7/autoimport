@@ -41,6 +41,7 @@ TBD
 
 # TODO
 
+* Handle updating export
 * Remove unused import
 * Sort `type` import after `value` import
 * Use eslint API to detect undefined identifier (https://eslint.org/docs/developer-guide/nodejs-api, https://github.com/eslint/eslint/blob/master/lib/rules/no-undef.js)
