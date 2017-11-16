@@ -47,7 +47,3 @@ TBD
 * Support ignore folders (like `build` folder created by CRA)
 * Add test for VSCode
 * Add travis test for VSCode
-
-# Credit
-
-Mainly base on jscodeshift
