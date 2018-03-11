@@ -46,7 +46,7 @@ const baseTransform = (
       return;
     }
 
-    const { exportKind, path: path_ } = importInfo;
+    const { exportKind, path: path_, actualName } = importInfo;
 
     if (!importMap[exportKind]) {
       importMap[exportKind] = {};
@@ -64,7 +64,9 @@ const baseTransform = (
     if (importInfo.defaultImport) {
       mapKind[path_].main = identifier;
     } else {
-      mapKind[path_].others = [...mapKind[path_].others, identifier];
+      const identifier_ =
+        actualName != null ? `${actualName} as ${identifier}` : identifier;
+      mapKind[path_].others = [...mapKind[path_].others, identifier_];
     }
   });
 

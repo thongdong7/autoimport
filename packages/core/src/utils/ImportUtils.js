@@ -179,7 +179,15 @@ function _getImportInfo(node: any) {
       item =>
         item.type === "ImportSpecifier" && item.local.type === "Identifier",
     )
-    .map(item => item.local.name);
+    .map(item => {
+      const localName = item.local.name;
+      const importedName = item.imported.name;
+      if (localName === importedName) {
+        return localName;
+      }
+
+      return `${importedName} as ${localName}`;
+    });
 
   ret.others = others;
 
@@ -211,7 +219,8 @@ function _buildPath(importInfo: TImportInfo, path_: string, importKind: TKind) {
   specifiers = [
     ...specifiers,
     ...others_
-      .sort()
+      // sort without case sensitive
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
       .map(other => builders.importSpecifier(builders.identifier(other))),
   ];
   return builders.importDeclaration(

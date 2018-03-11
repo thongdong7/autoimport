@@ -9,6 +9,41 @@ import type {
 } from "./types";
 import fs from "fs";
 import path from "path";
+import { flatMap } from "lodash";
+
+const _parseIdentifierNameOfOtherPattern = new RegExp(
+  "^(\\S+)\\s+as\\s+(\\S+)$",
+);
+export function parseIdentifierNameOfOther(otherStr: string) {
+  const result = _parseIdentifierNameOfOtherPattern.exec(otherStr);
+
+  if (result == null) {
+    return {
+      memberName: otherStr,
+      memberAlias: otherStr,
+    };
+  } else {
+    return {
+      memberAlias: result[2],
+      memberName: result[1],
+    };
+  }
+}
+
+function _getNodeModulesForMemberFolder(detectFolder, memberFolder): string {
+  const fullMemberFolder = path.join(
+    detectFolder,
+    "node_modules",
+    memberFolder,
+  );
+
+  if (!fs.existsSync(fullMemberFolder)) {
+    // TODO Show a warning or watch this folder to load again when memberFolder available
+    return "";
+  }
+
+  return fullMemberFolder;
+}
 
 export default class Config {
   options: TNormalizedOptions;
@@ -43,6 +78,13 @@ export default class Config {
 
     return c;
   }
+
+  getStats = () => {
+    return {
+      numberIdentifiers: Object.keys(this._memberMap).length,
+      memberFolders: this._getFullMemberFolders(),
+    };
+  };
 
   getCache = () => {
     return {
@@ -84,11 +126,17 @@ export default class Config {
     }
 
     for (const member of info.others || []) {
-      ret[member] = {
+      const { memberName, memberAlias } = parseIdentifierNameOfOther(member);
+
+      ret[memberAlias] = {
         path,
         defaultImport: false,
         exportKind: "value",
       };
+
+      if (memberName !== memberAlias) {
+        ret[memberAlias].actualName = memberName;
+      }
     }
 
     for (const member of info.types || []) {
@@ -150,19 +198,32 @@ export default class Config {
     added.forEach(p => this._addPackage(p, packages[p]));
   };
 
-  loadMemberFolders = () => {
-    for (const memberFolder of this.options.memberFolders || []) {
-      const fullMemberFolder = path.join(
+  _getFullMemberFolders = () => {
+    // $FlowFixMe
+    return flatMap(this.options.memberFolders || [], memberFolder => {
+      const detectFolders = [
         this.projectPath,
-        "node_modules",
-        memberFolder,
-      );
+        path.join(this.projectPath, path.dirname(this.rootPath)),
+        path.join(this.projectPath, this.rootPath),
+      ];
+      // console.log(detectFolders);
+      const fullMemberFolders = detectFolders
+        .map(detectFolder =>
+          _getNodeModulesForMemberFolder(detectFolder, memberFolder),
+        )
+        .filter(f => f !== "");
 
-      if (!fs.existsSync(fullMemberFolder)) {
-        // TODO Show a warning or watch this folder to load again when memberFolder available
-        continue;
-      }
+      // console.log(fullMemberFolders);
 
+      return fullMemberFolders.map(f => [f, memberFolder]);
+    });
+  };
+
+  loadMemberFolders = () => {
+    for (const [
+      fullMemberFolder,
+      memberFolder,
+    ] of this._getFullMemberFolders()) {
       const memberNames = fs
         .readdirSync(fullMemberFolder)
         .filter(item => item.endsWith(".js"))

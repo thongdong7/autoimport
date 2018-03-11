@@ -80,6 +80,8 @@ export type TMemberInfo = {
   defaultImport: boolean,
   // Export kind. es6 export: value, flow type export: type
   exportKind: TKind,
+  // Used in case member name is alias
+  actualName?: string,
 };
 
 export type TOptionPackageDiff = {|

@@ -40,6 +40,7 @@ function _parseIdenfierFromMsg(message: string): string {
   const found = message.match(identifierRegex);
 
   // console.log(found);
+  // $FlowFixMe
   return found[1];
 }
 
@@ -67,7 +68,8 @@ export function getUndefinedIdentifier(code: string): string[] {
 
   let undefinedIdentifiers = messages
     .filter(
-      item => item.ruleId === "no-undef" || item.ruleId === "react/jsx-no-undef"
+      item =>
+        item.ruleId === "no-undef" || item.ruleId === "react/jsx-no-undef",
     )
     .map(_errorToIdentifier)
     .filter(identifier => identifier !== false);

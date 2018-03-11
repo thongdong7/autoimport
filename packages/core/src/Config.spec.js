@@ -1,4 +1,4 @@
-import Config from "./Config";
+import Config, { parseIdentifierNameOfOther } from "./Config";
 import { initNormalizedOptions } from "./utils/OptionFile";
 
 describe("Config", () => {
@@ -42,5 +42,25 @@ describe("Config", () => {
     config.applyPackagesDiff({}, { removed: ["a"], added: [], replaced: [] });
     expect(config.getMemberInfo("A")).toBeUndefined();
     expect(config.getMemberInfo("A1")).toBeUndefined();
+  });
+});
+
+describe("parseIdentifierNameOfOther", () => {
+  it("could parse alias", () => {
+    const actual = parseIdentifierNameOfOther("Switch as UISwitch");
+
+    expect(actual).toEqual({
+      memberAlias: "UISwitch",
+      memberName: "Switch",
+    });
+  });
+
+  it("could parse non alias", () => {
+    const actual = parseIdentifierNameOfOther("Switch");
+
+    expect(actual).toEqual({
+      memberAlias: "Switch",
+      memberName: "Switch",
+    });
   });
 });

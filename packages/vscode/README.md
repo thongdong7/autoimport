@@ -19,7 +19,3 @@ TBD
 # Know issues
 
 * VS Code only allow one `Format Document` extension for Javascript, so if you are using extensions have the same feature (i.e: Prettier), these extensions need to be disabled.
-
-# Credit
-
-This extension inspired by Prettier extension. A lot of code is copied from that.
