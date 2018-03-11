@@ -4,9 +4,6 @@ import getUndefinedIndentifiers from "./DetectUndefinedIdentifier";
 import { ProjectConfigProvider } from "./ConfigProvider";
 import path from "path";
 import { updateImport } from "./utils/ImportUtils";
-import chalk from "chalk";
-
-const error = chalk.red;
 
 type TGetImport = (fileRelative: string, member: string) => ?TMemberInfo;
 
@@ -15,7 +12,7 @@ const baseTransform = (
   api: TAPI,
   rootPath: string,
   _getImport: TGetImport,
-  _getImportType: TGetImport
+  _getImportType: TGetImport,
 ): string => {
   // console.log("rp", rootPath, file.path);
   const j = api.jscodeshift;
@@ -44,7 +41,7 @@ const baseTransform = (
 
     if (!importInfo) {
       /* eslint-disable no-console */
-      // console.error(`Could not find path for identifier ${error(identifier)}`);
+      console.error(`Could not find path for identifier '${identifier}'`);
       /* eslint-enable no-console */
       return;
     }
@@ -71,6 +68,7 @@ const baseTransform = (
     }
   });
 
+  // console.log("import map", importMap);
   updateImport(ast, importMap);
 
   // Add import
@@ -80,7 +78,7 @@ const baseTransform = (
   while (true) {
     const result2 = result.replace(
       /(import[^\n]+from[^\n]+)\n{2,}import/g,
-      "$1\nimport"
+      "$1\nimport",
     );
     if (result2 === result) {
       break;
@@ -95,13 +93,13 @@ const baseTransform = (
 export const transformByConfigProvider = (
   file: TFile,
   api: TAPI,
-  configProvider: ProjectConfigProvider
+  configProvider: ProjectConfigProvider,
 ) => {
   return baseTransform(
     file,
     api,
     configProvider.getFullRootPath(),
     configProvider.getImport,
-    configProvider.getImport
+    configProvider.getImport,
   );
 };

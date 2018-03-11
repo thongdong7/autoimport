@@ -276,14 +276,12 @@ const y = X;
         `);
   });
 
-  it("could import React when Component is imported before", () => {
+  it("could import React and Component if not provided", () => {
     const tool = fixture();
     tool.startWithoutOptionFile();
 
     tool.format(
       `
-        import { Component } from "react";
-
         class A extends Component {
           render() {
             return <div>hello</div>;
@@ -293,7 +291,6 @@ const y = X;
       "Hello.js",
     ).is(`
         import React, { Component } from "react";
-    
         class A extends Component {
           render() {
             return <div>hello</div>;

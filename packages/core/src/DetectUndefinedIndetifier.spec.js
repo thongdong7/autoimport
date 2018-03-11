@@ -17,7 +17,7 @@ for (const detector of ["default"]) {
       code(`
       const A = () => <B title={C} />;
     `)
-        .missImport("C", "B")
+        .missImport("C", "B", "React")
         .noImport("A");
     });
 
@@ -296,7 +296,7 @@ for (const detector of ["default"]) {
     });
 
     it("miss-jsx-identifier", () => {
-      codeFile("miss-jsx-identifier").missImport("B");
+      codeFile("miss-jsx-identifier").missImport("B", "React");
     });
 
     it("destructure in arrow function", () => {

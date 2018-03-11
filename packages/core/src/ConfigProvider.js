@@ -170,8 +170,8 @@ export class ProjectConfigProvider {
   };
 
   /**
- * Check if file belong to this project
- */
+   * Check if file belong to this project
+   */
   containFile = (file: string) => {
     // console.log("cf", file, this.config.projectPath);
     return this.config.projectPath && file.startsWith(this.config.projectPath);

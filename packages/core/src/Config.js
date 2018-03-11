@@ -66,6 +66,10 @@ export default class Config {
     // Only accept the member not declared in ignore
     if (this.options.ignore.indexOf(member) < 0) {
       return this._memberMap[member];
+    } else {
+      /* eslint-disable no-console */
+      console.warn("Member in ignore", member);
+      /* eslint-enable no-console */
     }
   };
 
@@ -102,7 +106,7 @@ export default class Config {
     // console.log("p", p, this.packages);
     const tmp = this._getMemberInfosFromImportInfo(
       package_,
-      this.packages[package_]
+      this.packages[package_],
     );
     // console.log("tmp", tmp);
     for (const member of Object.keys(tmp)) {
@@ -128,7 +132,7 @@ export default class Config {
 
   applyPackagesDiff = (
     packages: TPackagesOption,
-    { removed, added, replaced }: TOptionPackageDiff
+    { removed, added, replaced }: TOptionPackageDiff,
   ) => {
     // Remove packages
     removed.forEach(this._removePackage);
@@ -151,7 +155,7 @@ export default class Config {
       const fullMemberFolder = path.join(
         this.projectPath,
         "node_modules",
-        memberFolder
+        memberFolder,
       );
 
       if (!fs.existsSync(fullMemberFolder)) {
