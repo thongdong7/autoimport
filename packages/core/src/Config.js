@@ -107,6 +107,9 @@ export default class Config {
   getMemberInfo = (member: string): ?TMemberInfo => {
     // Only accept the member not declared in ignore
     if (this.options.ignore.indexOf(member) < 0) {
+      if (!this._memberMap[member]) {
+        console.warn("there is no member", member);
+      }
       return this._memberMap[member];
     } else {
       /* eslint-disable no-console */
