@@ -32,7 +32,11 @@ cd packages/vscode
 npm install
 
 rm *.vsix || true
-vsce publish
+# vsce publish
+vsce package
+
+code --uninstall-extension thongdong7.vscode-autoimport || true
+code --install-extension *.vsix
 
 lerna clean --yes
 lerna bootstrap
