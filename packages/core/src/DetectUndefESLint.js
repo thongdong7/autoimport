@@ -31,7 +31,8 @@ const cli = new CLIEngine({
       experimentalObjectRestSpread: true,
     },
   },
-  plugins: ["react", "flowtype"],
+  plugins: ["import", "react", "flowtype"],
+  // 'import', 'flowtype', 'jsx-a11y', 'react'
   // plugins: ["react-app"],
 });
 

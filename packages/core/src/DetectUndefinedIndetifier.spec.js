@@ -344,5 +344,18 @@ export default connect(AnalyticsSelection);
         .missImport("connect")
         .noImport("A");
     });
+
+    it("unused imports", () => {
+      code(`
+        import A, {B, C as D} from './A';
+        import type A1 from './types';
+        import type {B1, C1} from './types';
+
+        const E: C1 = F;
+    `)
+        .unusedImport("A", "B", "D", "A1", "B1")
+        .missImport("F")
+        .noImport("C", "E");
+    });
   });
 }

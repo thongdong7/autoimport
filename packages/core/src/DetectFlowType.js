@@ -49,19 +49,24 @@ let ImportDeclarationIdentifiers = withQueryTransform({
   filter: {
     importKind: "type",
   },
-  flatNodeTransform: node => node.specifiers.map(item => item.imported.name),
+  flatNodeTransform: node =>
+    node.specifiers != null
+      ? node.specifiers
+          .map(item => (item.imported != null ? item.imported.name : null))
+          .filter(item => item)
+      : [],
 });
 
 export function detectFlowType(ast: TAST) {
   let definedTypes = compose(
     TypeAliasIdentifiers,
     ImportDeclarationIdentifiers,
-    TypeParameterIdentifier
+    TypeParameterIdentifier,
   )(ast);
 
   let undefinedTypes = compose(
     // Flow type idenfiers
-    GenericTypeAnnotationIdentifier
+    GenericTypeAnnotationIdentifier,
   )(ast);
 
   return difference(undefinedTypes, definedTypes);

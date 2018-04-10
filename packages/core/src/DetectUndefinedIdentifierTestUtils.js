@@ -40,11 +40,21 @@ export function codeBuilder(folder: string, detector: "default" | "eslint") {
     return code(content);
   }
   function code(source: string) {
-    const { identifiers: undefinedIdentifiers, types: undefinedTypes } = fnMap[
-      detector
-    ](source);
+    const {
+      identifiers: undefinedIdentifiers,
+      types: undefinedTypes,
+      unusedImports,
+    } = fnMap[detector](source);
 
     const checker = {
+      unusedImport(...identifiers: string[]) {
+        for (const identifier of identifiers) {
+          expect(unusedImports).toContain(identifier);
+        }
+
+        return checker;
+      },
+
       missImport(...identifiers: string[]) {
         for (const identifier of identifiers) {
           expect(undefinedIdentifiers).toContain(identifier);

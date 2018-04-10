@@ -6,6 +6,7 @@ import { detectFlowType } from "./DetectFlowType";
 import { detectIdentifiers, STOP_PROCESS } from "./utils/Detect";
 import type { TAST } from "./types";
 import { htmlTags } from "./utils/HTMLTags";
+import { getUndefinedIdentifier } from "./DetectUndefESLint";
 
 const types = recast.types.namedTypes;
 
@@ -318,6 +319,26 @@ const parentMissedIdentifier = ast => {
   return [...ret];
 };
 
+const _isImportPath = path => path.type === "ImportSpecifier";
+
+function getUnusedImports(ast) {
+  const unusedImports = new Set();
+
+  // Find all import identifiers
+  ast.find(types.ImportDeclaration).forEach(path => {
+    path.node.specifiers.forEach(item => unusedImports.add(item.local.name));
+  });
+
+  // Remove identifiers which in import path
+  ast.find(types.Identifier).forEach(path => {
+    if (_isImportPath(path.parent)) {
+      unusedImports.delete(path.node.name);
+    }
+  });
+
+  return [...unusedImports.values()];
+}
+
 const builtinGlobal = new Set([
   "JSON",
   "Object",
@@ -326,11 +347,13 @@ const builtinGlobal = new Set([
   "console",
   "alert",
 ]);
-import { getUndefinedIdentifier } from "./DetectUndefESLint";
 
 export default (ast: TAST) => {
+  const undefinedIdentifiers = getUndefinedIdentifier(ast.toSource());
+
   return {
-    identifiers: getUndefinedIdentifier(ast.toSource()),
+    identifiers: undefinedIdentifiers,
+    unusedImports: getUnusedImports(ast),
     types: detectFlowType(ast),
   };
 };
