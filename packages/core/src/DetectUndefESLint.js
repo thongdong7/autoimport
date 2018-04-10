@@ -120,16 +120,16 @@ export function getUndefinedIdentifier(code: string): string[] {
 /**
  * Get undefined and unused identifiers
  */
-export function getErrorIdentifiers(code: string): Object {
-  const out = cli.executeOnText(code);
-  const messages = flatMap(out.results, results => results.messages);
-  console.log(messages);
+// export function getErrorIdentifiers(code: string): Object {
+//   const out = cli.executeOnText(code);
+//   const messages = flatMap(out.results, results => results.messages);
+//   console.log(messages);
 
-  let undefinedIdentifiers = _getUndefineIdentifierFromMessages(messages);
-  let unusedIdentifiers = _getUnusedImportIdentifierFromMessages(messages);
+//   let undefinedIdentifiers = _getUndefineIdentifierFromMessages(messages);
+//   let unusedIdentifiers = _getUnusedImportIdentifierFromMessages(messages);
 
-  return {
-    undefined: undefinedIdentifiers,
-    unused: unusedIdentifiers,
-  };
-}
+//   return {
+//     undefined: undefinedIdentifiers,
+//     unused: unusedIdentifiers,
+//   };
+// }

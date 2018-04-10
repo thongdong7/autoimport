@@ -357,5 +357,23 @@ export default connect(AnalyticsSelection);
         .missImport("F")
         .noImport("C", "E");
     });
+
+    it("get unused with React", () => {
+      code(`
+        import React from 'react';
+        import A from './A';
+        
+        export const b = props => <div />;
+        `)
+        .unusedImport("A")
+        .usedImport("React");
+    });
+
+    it("get unused with React 2", () => {
+      code(`
+        import React from 'react';
+        import A from './A';
+        `).unusedImport("A", "React");
+    });
   });
 }

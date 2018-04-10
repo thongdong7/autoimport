@@ -1,7 +1,4 @@
-import {
-  getUndefinedIdentifier,
-  getErrorIdentifiers,
-} from "./DetectUndefESLint";
+import { getUndefinedIdentifier } from "./DetectUndefESLint";
 
 describe("Undefined Identifier using ESLint", () => {
   // In ESLint we trust
@@ -19,16 +16,16 @@ describe("Undefined Identifier using ESLint", () => {
     expect(actual).toEqual(["a", "e", "c"]);
   });
 
-  fit("get unused with React", () => {
-    const actual = getErrorIdentifiers(`
-      import React from 'react';
-      import A from './A';
+  // fit("get unused with React", () => {
+  //   const actual = getErrorIdentifiers(`
+  //     import React from 'react';
+  //     import A from './A';
 
-      export const b = props => <div />;
-    `);
+  //     export const b = props => <div />;
+  //   `);
 
-    expect(actual).toEqual({ undefined: [], unused: ["A"] });
-  });
+  //   expect(actual).toEqual({ undefined: [], unused: ["A"] });
+  // });
 
   // fit("get unused without React", () => {
   //   const actual = getErrorIdentifiers(`

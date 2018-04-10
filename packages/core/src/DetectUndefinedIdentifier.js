@@ -336,6 +336,13 @@ function getUnusedImports(ast) {
     }
   });
 
+  const hasReact = ast.find(types.JSXElement).size() > 0;
+
+  if (hasReact) {
+    // Remove React from unused imports
+    unusedImports.delete("React");
+  }
+
   return [...unusedImports.values()];
 }
 

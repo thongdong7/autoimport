@@ -54,6 +54,13 @@ export function codeBuilder(folder: string, detector: "default" | "eslint") {
 
         return checker;
       },
+      usedImport(...identifiers: string[]) {
+        for (const identifier of identifiers) {
+          expect(unusedImports).not.toContain(identifier);
+        }
+
+        return checker;
+      },
 
       missImport(...identifiers: string[]) {
         for (const identifier of identifiers) {
