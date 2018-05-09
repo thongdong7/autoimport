@@ -319,7 +319,11 @@ const parentMissedIdentifier = ast => {
   return [...ret];
 };
 
-const _isImportPath = path => path.type === "ImportSpecifier";
+const _isImportPath = path =>
+  path.node.type === "ImportSpecifier" ||
+  path.node.type === "ImportDefaultSpecifier";
+const _isFlowTypeAnnotationPath = path =>
+  path.node.type === "GenericTypeAnnotation";
 
 function getUnusedImports(ast) {
   const unusedImports = new Set();
@@ -329,12 +333,24 @@ function getUnusedImports(ast) {
     path.node.specifiers.forEach(item => unusedImports.add(item.local.name));
   });
 
-  // Remove identifiers which in import path
+  // Remove identifiers which in not in import path
   ast.find(types.Identifier).forEach(path => {
-    if (_isImportPath(path.parent)) {
+    // console.log(
+    //   "a",
+    //   path.node.name,
+    //   path.parent.node.type,
+    //   "notImportPath",
+    //   !_isImportPath(path.parent),
+    //   "_isFlowTypeAnnotationPath",
+    //   _isFlowTypeAnnotationPath(path.parent),
+    // );
+
+    if (!_isImportPath(path.parent) || _isFlowTypeAnnotationPath(path.parent)) {
       unusedImports.delete(path.node.name);
     }
   });
+
+  // Remove type identifiers which in import path
 
   const hasReact = ast.find(types.JSXElement).size() > 0;
 
@@ -344,6 +360,30 @@ function getUnusedImports(ast) {
   }
 
   return [...unusedImports.values()];
+}
+
+export function removeImportIdentifiers(j, ast, unusedImports) {
+  ast.find(types.ImportDeclaration).forEach(path => {
+    if (path.node.specifiers.length > 0) {
+      // console.log("unusedImports", unusedImports);
+      // console.log(path.node);
+      path.node.specifiers = path.node.specifiers.filter(item => {
+        // console.log(
+        //   "check remove",
+        //   item.local.name,
+        //   unusedImports,
+        //   unusedImports.indexOf(item.local.name) >= 0,
+        // );
+        return unusedImports.indexOf(item.local.name) < 0;
+      });
+
+      if (path.node.specifiers.length === 0) {
+        // remove import
+        // console.log("remove", path.node.source.raw);
+        j(path).remove();
+      }
+    }
+  });
 }
 
 const builtinGlobal = new Set([

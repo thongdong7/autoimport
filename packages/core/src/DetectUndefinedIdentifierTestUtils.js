@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { prepareJscodeshift } from "./utils/jscodeshift";
-import DetectUndefinedIdentifier from "./DetectUndefinedIdentifier";
+import DetectUndefinedIdentifier, {
+  removeImportIdentifiers,
+} from "./DetectUndefinedIdentifier";
 import { getUndefinedIdentifier } from "./DetectUndefESLint";
 
 type TFNResult = {
@@ -13,7 +15,11 @@ type TFN = (source: string) => TFNResult;
 const defaultFN: TFN = source => {
   const j = prepareJscodeshift();
   const ast = j(source);
-  return DetectUndefinedIdentifier(ast);
+  return {
+    ...DetectUndefinedIdentifier(ast),
+    ast,
+    jscodeshift: j,
+  };
 };
 
 const eslintFN: TFN = source => {
@@ -44,6 +50,8 @@ export function codeBuilder(folder: string, detector: "default" | "eslint") {
       identifiers: undefinedIdentifiers,
       types: undefinedTypes,
       unusedImports,
+      ast,
+      jscodeshift,
     } = fnMap[detector](source);
 
     const checker = {
@@ -90,6 +98,22 @@ export function codeBuilder(folder: string, detector: "default" | "eslint") {
         for (const identifier of identifiers) {
           expect(undefinedTypes).not.toContain(identifier);
         }
+
+        return checker;
+      },
+
+      expectAfterClean(expected: string) {
+        removeImportIdentifiers(jscodeshift, ast, unusedImports);
+
+        // console.log(removeCodeIndent(expected));
+        const toLines = text =>
+          text
+            .split("\n")
+            .map(line => line.trim())
+            .filter(line => line !== "");
+        const expectedLines = toLines(expected);
+        const actualLines = toLines(ast.toSource());
+        expect(expectedLines).toEqual(actualLines);
 
         return checker;
       },
