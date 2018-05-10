@@ -80,11 +80,12 @@ describe("Detect Undefined Identifier for Flow Type", () => {
   });
 
   // TODO Fix this
-  it.skip("flow generic class", () => {
+  it("flow generic class", () => {
     code(`
     class B extends C<T2> {}
     `)
-      .missImport("T2", "C")
+      .missImportType("T2")
+      .missImport("C")
       // .missImport("T2", "C", "D", "E")
       .noImport("T1", "A", "B", "T3");
   });

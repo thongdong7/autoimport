@@ -328,6 +328,11 @@ const _isFlowTypeAnnotationPath = path =>
 function getUnusedImports(ast) {
   const unusedImports = new Set();
 
+  // console.log(ast.toSource());
+
+  // ast.find(types.Identifier).forEach(path => {
+  //   console.log("b", path.node.name);
+  // });
   // Find all import identifiers
   ast.find(types.ImportDeclaration).forEach(path => {
     path.node.specifiers.forEach(item => unusedImports.add(item.local.name));
@@ -397,9 +402,11 @@ const builtinGlobal = new Set([
 
 export default (ast: TAST) => {
   const undefinedIdentifiers = getUndefinedIdentifier(ast.toSource());
+  // const otherUndefinedIdentifiers = detectFlowType(ast);
 
   return {
     identifiers: undefinedIdentifiers,
+    // identifiers: uniq([...undefinedIdentifiers, ...otherUndefinedIdentifiers]),
     unusedImports: getUnusedImports(ast),
     types: detectFlowType(ast),
   };
