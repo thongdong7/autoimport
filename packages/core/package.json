@@ -1,6 +1,6 @@
 {
   "name": "autoimport",
-  "version": "0.0.50",
+  "version": "0.0.51",
   "main": "lib/index.js",
   "license": "MIT",
   "dependencies": {
@@ -39,7 +39,13 @@
     "shelljs": "^0.7.8"
   },
   "jest": {
-    "testPathIgnorePatterns": ["/node_modules/", "/lib/", "/tmp/"],
-    "setupFiles": ["./src/setupTests.js"]
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib/",
+      "/tmp/"
+    ],
+    "setupFiles": [
+      "./src/setupTests.js"
+    ]
   }
 }
