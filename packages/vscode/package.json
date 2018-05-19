@@ -2,7 +2,7 @@
     "name": "vscode-autoimport",
     "displayName": "Auto Import for Javascript",
     "description": "Support ES6 and Flowtype",
-    "version": "0.0.55",
+    "version": "0.0.56",
     "publisher": "thongdong7",
     "private": true,
     "engines": {
@@ -30,7 +30,7 @@
         "test": "node ./node_modules/vscode/bin/test"
     },
     "dependencies": {
-        "autoimport": "^0.0.55",
+        "autoimport": "^0.0.56",
         "prettier": "1.6.1",
         "prettier-eslint": "^6.4.2",
         "read-pkg-up": "2.0.0",
