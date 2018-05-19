@@ -71,7 +71,16 @@ describe("ConfigProvider", () => {
         const checker = {
           is: (expectedText: string) => {
             // console.log(removeCodeIndent(expectedText));
-            expect(nextText.trim()).toEqual(removeCodeIndent(expectedText));
+            const _toLines = text =>
+              text
+                .trim()
+                .split("\n")
+                .map(line => line.trim())
+                .filter(line => line !== "");
+
+            const inputLines = _toLines(nextText);
+            const expectedLines = _toLines(removeCodeIndent(expectedText));
+            expect(inputLines).toEqual(expectedLines);
 
             return checker;
           },
@@ -86,7 +95,7 @@ describe("ConfigProvider", () => {
       "types.js",
       `
     export type TName = string;
-    `,
+    `
     );
 
     return tool;
@@ -203,7 +212,7 @@ console.log(UISwitch);
         rootPath: "",
         ignore: ["Abc"],
       },
-      { notify: true },
+      { notify: true }
     );
 
     tool.format("const x1 = Abc;").is("const x1 = Abc;");
@@ -277,7 +286,7 @@ const A: TName = "abc";
       `
 const y = X;
     `,
-      "d1/d2/d3/Y.js",
+      "d1/d2/d3/Y.js"
     ).is(`
 import { X } from "./X";
 const y = X;
@@ -294,7 +303,7 @@ const y = X;
       `
 const y = X;
         `,
-      "d1/d2/d3/Y.js",
+      "d1/d2/d3/Y.js"
     ).is(`
 import { X } from "./X";
 const y = X;
@@ -310,7 +319,7 @@ const y = X;
         const Hello = () => <div>Hello</div>;
         ReactDOM.render(<Hello />);
         `,
-      "Hello.js",
+      "Hello.js"
     ).is(`
       import React from "react";
       import ReactDOM from "react-dom";
@@ -331,7 +340,7 @@ const y = X;
           }
         }
         `,
-      "Hello.js",
+      "Hello.js"
     ).is(`
         import React, { Component } from "react";
         class A extends Component {
@@ -352,13 +361,13 @@ const y = X;
 
     tool.format(
       `
-const b = A;
-        `,
-      "src/d1/e1/e2/e3/B.js",
+      const b = A;
+    `,
+      "src/d1/e1/e2/e3/B.js"
     ).is(`
-import { A } from "../../../d2/A";
-const b = A;
-        `);
+      import { A } from "../../../d2/A";
+      const b = A;
+    `);
   });
 
   it("could combine with the current import", () => {
@@ -366,26 +375,38 @@ const b = A;
     tool.startWithoutOptionFile();
 
     // main
-    tool.format(
-      `
-import React from "react";
-class A extends Component {}
-      `,
-    ).is(`
-import React, { Component } from "react";
-class A extends Component {}
-        `);
+    tool.format(`
+      import React from "react";
+      class A extends Component {
+        render() {
+          return <div />;
+        }
+      }
+    `).is(`
+      import React, { Component } from "react";
+      class A extends Component {
+        render() {
+          return <div />;
+        }
+      }
+    `);
 
     // others
-    tool.format(
-      `
-import { Component } from "react";
-const A = () => <div>a</div>;
-      `,
-    ).is(`
-import React, { Component } from "react";
-const A = () => <div>a</div>;
-        `);
+    tool.format(`
+      import { Component } from "react";
+      class A extends Component {
+        render() {
+          return <div />;
+        }
+      }
+    `).is(`
+        import React, { Component } from "react";
+        class A extends Component {
+          render() {
+            return <div />;
+          }
+        }
+    `);
   });
 
   it("could combine with the current import for type importKind `value` and `type`", () => {
@@ -395,28 +416,30 @@ const A = () => <div>a</div>;
     tool.writeFile(
       "C.js",
       `
-export type TName = string;
-export type TAge = number;
-export const A = 1;
-export const B = 2;
-export const X = 2;
-export default "hello";
-      `,
-    );
-    tool.format(
+          export type TName = string;
+          export type TAge = number;
+          export const A = 1;
+          export const B = 2;
+          export const X = 2;
+          export default "hello";
       `
-      import type { TAge } from "./C";
-      import { X } from "./C";
-      import { A } from "./C";
-      const x = B;
-      const y: TName = C;
-      `,
-    ).is(`
-      import C, { A, B, X } from "./C";
-      import type { TAge, TName } from "./C";
-      const x = B;
-      const y: TName = C;
-        `);
+    );
+    tool.format(`
+        import type { TAge } from "./C";
+        import { X } from "./C";
+        import { A } from "./C";
+        const x: A = B;
+        const x2: X = 1;
+        const x3: TAge = 1;
+        const y: TName = C;
+      `).is(`
+        import C, { A, B, X } from "./C";
+        import type { TAge, TName } from "./C";
+        const x: A = B;
+        const x2: X = 1;
+        const x3: TAge = 1;
+        const y: TName = C;
+      `);
   });
 
   it("keep flow comment at the first line", () => {
@@ -429,7 +452,7 @@ export default "hello";
       `
       // @flow
       const b = A;`,
-      "B.js",
+      "B.js"
     ).is(`
       // @flow
       import { A } from "./A";
@@ -445,12 +468,12 @@ export default "hello";
       `
       // @flow
       import React from 'react';
-      const b = 1;`,
-      "B.js",
+      const b = () => <div />;`,
+      "B.js"
     ).is(`
       // @flow
       import React from 'react';
-      const b = 1;`);
+      const b = () => <div />;`);
   });
 
   it("keep flow comment at the first line for text has import apart", () => {
@@ -461,12 +484,20 @@ export default "hello";
       `
       // @flow
       import React from 'react';
-      class A extends Component {}`,
-      "B.js",
+      class A extends Component {
+        render() {
+          return <div />;
+        }
+      }`,
+      "B.js"
     ).is(`
       // @flow
       import React, { Component } from "react";
-      class A extends Component {}`);
+      class A extends Component {
+        render() {
+          return <div />;
+        }
+      }`);
   });
 
   it("auto sort even not have new import", () => {
@@ -478,12 +509,37 @@ export default "hello";
       // @flow
       import A from "./A";
       import React from "react";
+
+      const b = () => <A />;
       `,
-      "B.js",
+      "B.js"
     ).is(`
       // @flow
       import React from "react";
       import A from "./A";
+
+      const b = () => <A />;
+      `);
+  });
+
+  it.skip("don't remove first comment when remove unused import", () => {
+    const tool = fixture();
+    tool.startWithoutOptionFile();
+
+    tool.format(
+      `
+      // @flow
+      import A from "./A";
+      import React from "react";
+
+      const b = () => <div />;
+      `,
+      "B.js"
+    ).is(`
+      // @flow
+      import React from "react";
+
+      const b = () => <div />;
       `);
   });
 
@@ -513,7 +569,7 @@ export default "hello";
       export default class Z extends Component {
 
       }
-    `,
+    `
     );
 
     tool.format(`
@@ -525,12 +581,14 @@ export default "hello";
       import { Button } from "antd";
       import type { TUser } from "./types";
 
-      const a = () => {
+      const a: TUser = () => {
         return (
           <div>
             <X />
             <Y />
             <A />
+            <U />
+            <Button />
           </div>
         )
       }
@@ -542,12 +600,14 @@ export default "hello";
         import U from "./U";
         import type { TUser } from "./types";
 
-        const a = () => {
+        const a: TUser = () => {
           return (
             <div>
               <X />
               <Y />
               <A />
+              <U />
+              <Button />
             </div>
           )
         }
@@ -569,7 +629,7 @@ export default "hello";
       export default class Z extends Component {
 
       }
-    `,
+    `
     );
 
     tool.format(`
@@ -605,7 +665,7 @@ export default "hello";
       "A.js",
       `
       export default 1;
-    `,
+    `
     );
 
     tool.format(`
@@ -614,6 +674,28 @@ export default "hello";
     `).is(`
       // autoimport-disable
       const b = A;
+    `);
+  });
+
+  it("support remove unused import", () => {
+    const tool = fixture();
+    tool.startWithoutOptionFile();
+
+    tool.format(`
+      import A, {B, C as D} from './A';
+      import type A1 from './types1';
+      import type {B1, C1} from './types2';
+      import "a.css";
+      import "./SideEffect";
+
+      const E: C1 = F;
+    `).is(`
+      import "./SideEffect";
+
+      import "a.css";
+      import type { C1 } from './types2';
+
+      const E: C1 = F;
     `);
   });
 });
@@ -699,7 +781,7 @@ describe("ConfigProvider cache", () => {
       "types.js",
       `
     export type TName = string;
-    `,
+    `
     );
 
     tool.startWithoutOptionFile();
@@ -715,7 +797,7 @@ describe("ConfigProvider cache", () => {
       projectPath + "/a.js",
       `
 const a: TName = "abc";
-    `,
+    `
     );
     // console.log(text);
     expect(text).toContain(`import type { TName } from "./types";`);

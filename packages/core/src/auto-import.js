@@ -1,6 +1,8 @@
 // @flow
 import type { TFile, TAPI, TMemberInfo } from "./types";
-import getUndefinedIndentifiers from "./DetectUndefinedIdentifier";
+import DetectUndefinedIdentifier, {
+  removeImportIdentifiers,
+} from "./DetectUndefinedIdentifier";
 import { ProjectConfigProvider } from "./ConfigProvider";
 import path from "path";
 import { updateImport } from "./utils/ImportUtils";
@@ -23,7 +25,9 @@ const baseTransform = (
   const {
     identifiers: missedIdentifiers,
     types: missedTypes,
-  } = getUndefinedIndentifiers(ast);
+    unusedImports,
+  } = DetectUndefinedIdentifier(ast);
+  removeImportIdentifiers(j, ast, unusedImports);
   // console.log("missed", missedIdentifiers);
   // console.log("missed type", missedTypes);
   // console.log("root path", config.rootPath, file.path);
@@ -77,17 +81,18 @@ const baseTransform = (
   let result: string = ast.toSource();
 
   // Remove the empty line between 2 imports
-  while (true) {
-    const result2 = result.replace(
-      /(import[^\n]+from[^\n]+)\n{2,}import/g,
-      "$1\nimport",
-    );
-    if (result2 === result) {
-      break;
-    }
+  // The following code is wrong when the import has multiple line
+  // while (true) {
+  //   const result2 = result.replace(
+  //     /(import[^\n]+from[^\n]+)\n{2,}import/g,
+  //     "$1\nimport",
+  //   );
+  //   if (result2 === result) {
+  //     break;
+  //   }
 
-    result = result2;
-  }
+  //   result = result2;
+  // }
 
   return result;
 };

@@ -4,7 +4,7 @@ for (const detector of ["default"]) {
   describe(`Detect Undefined Identifier: ${detector}`, () => {
     const { code, codeFile } = codeBuilder(
       "DetectUndefinedIdentifier",
-      detector,
+      detector
     );
 
     // it("_DebugUndefinedIdentifier", () => {
@@ -25,7 +25,7 @@ for (const detector of ["default"]) {
       code(
         `
       const a = B + C;
-    `,
+    `
       )
         .missImport("B", "C")
         .noImport("a");
@@ -35,7 +35,7 @@ for (const detector of ["default"]) {
       code(
         `
       const a = 3 / (B + (1+ (2 * C)));
-    `,
+    `
       )
         .missImport("B", "C")
         .noImport("a");
@@ -47,7 +47,7 @@ for (const detector of ["default"]) {
       const a = {
         x: B + C
       };
-    `,
+    `
       )
         .missImport("B", "C")
         .noImport("a", "x");
@@ -59,7 +59,7 @@ for (const detector of ["default"]) {
       const a = {
         x: 3 / (B + (1+ (2 * C)))
       };
-    `,
+    `
       )
         .missImport("B", "C")
         .noImport("a", "x");
@@ -77,7 +77,7 @@ for (const detector of ["default"]) {
       code(
         `
       function a() {}
-    `,
+    `
       ).noImport("a");
     });
 
@@ -85,7 +85,7 @@ for (const detector of ["default"]) {
       code(
         `
       const a = () => {};
-    `,
+    `
       ).noImport("a");
     });
 
@@ -94,7 +94,7 @@ for (const detector of ["default"]) {
         `
       let {a: {b: {c}}} = x;
       c.d = 1;
-    `,
+    `
       )
         .noImport("a", "b", "c", "d")
         .missImport("x");
@@ -106,7 +106,7 @@ for (const detector of ["default"]) {
         function x({a: {b: {c}}}) {
           c.d = 1;
         };
-      `,
+      `
       ).noImport("x", "a", "b", "c", "d");
     });
 
@@ -126,7 +126,7 @@ for (const detector of ["default"]) {
           function x() {
             return y;
           };
-        `,
+        `
       )
         .noImport("x", "config")
         .missImport("y");
@@ -138,7 +138,7 @@ for (const detector of ["default"]) {
       function f1() {
         return p1 => f2(p1);
       }
-      `,
+      `
       )
         .noImport("f1", "p1")
         .missImport("f2");
@@ -150,7 +150,7 @@ for (const detector of ["default"]) {
         function x(config) {
           const {type, ...rest} = config;
         };
-      `,
+      `
       ).noImport("x", "config", "type", "rest");
     });
 
@@ -160,7 +160,7 @@ for (const detector of ["default"]) {
         const {a, b: b1, ...rest} = {};
       
         x(a, b, b1, rest);
-      `,
+      `
       )
         .noImport("a", "b1", "rest")
         .missImport("x", "b");
@@ -190,7 +190,7 @@ for (const detector of ["default"]) {
       code(
         `
         x(y);
-      `,
+      `
       ).missImport("x", "y");
     });
 
@@ -256,7 +256,7 @@ for (const detector of ["default"]) {
       code(
         `
       const a = <Abc x={1} toggle/>
-      `,
+      `
       )
         .missImport("Abc", "React")
         .noImport("x", "toggle");
@@ -266,7 +266,7 @@ for (const detector of ["default"]) {
       code(
         `
       const a = <div />
-      `,
+      `
       ).noImport("div");
     });
 

@@ -38,6 +38,7 @@ TBD
 
 # TODO
 
+* Don't remove first comment when remove unused import (bug)
 * Handle updating export
 * Support ignore folders (like `build` folder created by CRA)
 * Add test for VSCode

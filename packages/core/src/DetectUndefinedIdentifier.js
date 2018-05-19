@@ -1,5 +1,4 @@
 // @flow
-/* eslint-disable */
 import { difference, uniq } from "lodash";
 import recast from "recast";
 import { detectFlowType } from "./DetectFlowType";
@@ -141,7 +140,7 @@ let ObjectExpressionIdentifier = withQueryTransform({
     ...node.properties
       .filter(
         item =>
-          item.type === "Property" && isIdentifier(item.key) && item.computed
+          item.type === "Property" && isIdentifier(item.key) && item.computed,
       )
       .map(item => item.key.name),
   ],
@@ -295,7 +294,7 @@ const parentMissedIdentifier = ast => {
     JSXExpressionContainer,
     VariableDeclarator2,
     Property2,
-    JSXIdentifier
+    JSXIdentifier,
     // ClassExtendsGenericType
     // BinaryExpression2
   );
@@ -371,7 +370,7 @@ function getUnusedImports(ast) {
 export function removeImportIdentifiers(
   j: any,
   ast: TAST,
-  unusedImports: string[]
+  unusedImports: string[],
 ) {
   ast.find(types.ImportDeclaration).forEach(path => {
     if (path.node.specifiers.length > 0) {
