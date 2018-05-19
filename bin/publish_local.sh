@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
@@ -29,7 +29,8 @@ echo Publish vscode package...
 cd packages/vscode
 
 # Need to install the package from npm as `vsce` does not support linked package.
-npm install
+rm -Rf node_modules/ package-lock.json
+npm install --no-optional
 
 rm *.vsix || true
 # vsce publish

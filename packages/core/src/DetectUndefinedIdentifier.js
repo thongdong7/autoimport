@@ -1,11 +1,13 @@
 // @flow
+/* eslint-disable */
 import { difference, uniq } from "lodash";
 import recast from "recast";
-import { withQueryTransform, isIdentifier, compose } from "./utils/Query";
 import { detectFlowType } from "./DetectFlowType";
+import { getUndefinedIdentifier } from "./DetectUndefESLint";
 import { detectIdentifiers, STOP_PROCESS } from "./utils/Detect";
-import type { TAST } from "./types";
 import { htmlTags } from "./utils/HTMLTags";
+import { withQueryTransform, isIdentifier, compose } from "./utils/Query";
+import type { TAST } from "./types";
 
 const types = recast.types.namedTypes;
 
@@ -139,7 +141,7 @@ let ObjectExpressionIdentifier = withQueryTransform({
     ...node.properties
       .filter(
         item =>
-          item.type === "Property" && isIdentifier(item.key) && item.computed,
+          item.type === "Property" && isIdentifier(item.key) && item.computed
       )
       .map(item => item.key.name),
   ],
@@ -293,7 +295,7 @@ const parentMissedIdentifier = ast => {
     JSXExpressionContainer,
     VariableDeclarator2,
     Property2,
-    JSXIdentifier,
+    JSXIdentifier
     // ClassExtendsGenericType
     // BinaryExpression2
   );
@@ -318,6 +320,82 @@ const parentMissedIdentifier = ast => {
   return [...ret];
 };
 
+const _isImportPath = path =>
+  path.node.type === "ImportSpecifier" ||
+  path.node.type === "ImportDefaultSpecifier";
+const _isFlowTypeAnnotationPath = path =>
+  path.node.type === "GenericTypeAnnotation";
+
+function getUnusedImports(ast) {
+  const unusedImports = new Set();
+
+  // console.log(ast.toSource());
+
+  // ast.find(types.Identifier).forEach(path => {
+  //   console.log("b", path.node.name);
+  // });
+  // Find all import identifiers
+  ast.find(types.ImportDeclaration).forEach(path => {
+    path.node.specifiers.forEach(item => unusedImports.add(item.local.name));
+  });
+
+  // Remove identifiers which in not in import path
+  ast.find(types.Identifier).forEach(path => {
+    // console.log(
+    //   "a",
+    //   path.node.name,
+    //   path.parent.node.type,
+    //   "notImportPath",
+    //   !_isImportPath(path.parent),
+    //   "_isFlowTypeAnnotationPath",
+    //   _isFlowTypeAnnotationPath(path.parent),
+    // );
+
+    if (!_isImportPath(path.parent) || _isFlowTypeAnnotationPath(path.parent)) {
+      unusedImports.delete(path.node.name);
+    }
+  });
+
+  // Remove type identifiers which in import path
+
+  const hasReact = ast.find(types.JSXElement).size() > 0;
+
+  if (hasReact) {
+    // Remove React from unused imports
+    unusedImports.delete("React");
+  }
+
+  return [...unusedImports.values()];
+}
+
+export function removeImportIdentifiers(
+  j: any,
+  ast: TAST,
+  unusedImports: string[]
+) {
+  ast.find(types.ImportDeclaration).forEach(path => {
+    if (path.node.specifiers.length > 0) {
+      // console.log("unusedImports", unusedImports);
+      // console.log(path.node);
+      path.node.specifiers = path.node.specifiers.filter(item => {
+        // console.log(
+        //   "check remove",
+        //   item.local.name,
+        //   unusedImports,
+        //   unusedImports.indexOf(item.local.name) >= 0,
+        // );
+        return unusedImports.indexOf(item.local.name) < 0;
+      });
+
+      if (path.node.specifiers.length === 0) {
+        // remove import
+        // console.log("remove", path.node.source.raw);
+        j(path).remove();
+      }
+    }
+  });
+}
+
 const builtinGlobal = new Set([
   "JSON",
   "Object",
@@ -326,11 +404,15 @@ const builtinGlobal = new Set([
   "console",
   "alert",
 ]);
-import { getUndefinedIdentifier } from "./DetectUndefESLint";
 
 export default (ast: TAST) => {
+  const undefinedIdentifiers = getUndefinedIdentifier(ast.toSource());
+  // const otherUndefinedIdentifiers = detectFlowType(ast);
+
   return {
-    identifiers: getUndefinedIdentifier(ast.toSource()),
+    identifiers: undefinedIdentifiers,
+    // identifiers: uniq([...undefinedIdentifiers, ...otherUndefinedIdentifiers]),
+    unusedImports: getUnusedImports(ast),
     types: detectFlowType(ast),
   };
 };

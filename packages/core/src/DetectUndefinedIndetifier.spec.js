@@ -344,5 +344,64 @@ export default connect(AnalyticsSelection);
         .missImport("connect")
         .noImport("A");
     });
+
+    it("remove unused type", () => {
+      code(`
+        import type {B1, C1} from './types2';
+
+        const E: C1 = F;
+    `)
+        .unusedImport("B1")
+        .usedImport("C1").expectAfterClean(`
+        import type { C1 } from './types2';
+
+        const E: C1 = F;
+        `);
+    });
+
+    it("remove unused imports", () => {
+      code(`
+        import A, {B, C as D} from './A';
+        import type A1 from './types1';
+        import type {B1, C1} from './types2';
+        import "a.css";
+        import "./SideEffect";
+
+        const E: C1 = F;
+    `)
+        .unusedImport("A", "B", "D", "A1", "B1")
+        .missImport("F")
+        .noImport("C", "E").expectAfterClean(`
+        import type { C1 } from './types2';
+        import "a.css";
+        import "./SideEffect";
+
+        const E: C1 = F;
+        `);
+    });
+
+    it("get unused with React", () => {
+      code(`
+        import React from 'react';
+        import A from './A';
+        
+        export const b = props => <div />;
+        `)
+        .unusedImport("A")
+        .usedImport("React").expectAfterClean(`
+        import React from 'react';
+        
+        export const b = props => <div />;
+        `);
+    });
+
+    it("get unused with React 2", () => {
+      code(`
+        import React from 'react';
+        import A from './A';
+        `)
+        .unusedImport("A", "React")
+        .expectAfterClean(``);
+    });
   });
 }

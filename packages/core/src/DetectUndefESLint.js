@@ -1,10 +1,11 @@
 // @flow
-import { flatMap, uniq } from "lodash";
+import { flatMap, uniq, remove } from "lodash";
 import { CLIEngine } from "eslint";
 import { builtinGlobal } from "./utils/BuiltinIdentifiers";
 
 const cli = new CLIEngine({
   useEslintrc: false,
+  extends: "react-app1",
   rules: {
     "react/jsx-no-undef": "error",
     "react/react-in-jsx-scope": "error",
@@ -14,6 +15,7 @@ const cli = new CLIEngine({
     "flowtype/require-valid-file-annotation": "error",
     "flowtype/use-flow-type": "error",
     "no-undef": "error",
+    "no-unused-vars": "error",
   },
   env: {
     node: true,
@@ -29,7 +31,8 @@ const cli = new CLIEngine({
       experimentalObjectRestSpread: true,
     },
   },
-  plugins: ["react", "flowtype"],
+  plugins: ["import", "react", "flowtype"],
+  // 'import', 'flowtype', 'jsx-a11y', 'react'
   // plugins: ["react-app"],
 });
 
@@ -61,11 +64,7 @@ function _errorToIdentifier(item: { message: string, source: string }) {
   return identifier;
 }
 
-export function getUndefinedIdentifier(code: string): string[] {
-  const out = cli.executeOnText(code);
-  const messages = flatMap(out.results, results => results.messages);
-  // console.log(messages);
-
+function _getUndefineIdentifierFromMessages(messages) {
   let undefinedIdentifiers = messages
     .filter(
       item =>
@@ -85,3 +84,52 @@ export function getUndefinedIdentifier(code: string): string[] {
   // console.log(undefinedIdentifiers);
   return uniq(undefinedIdentifiers);
 }
+
+function _getUnusedImportIdentifierFromMessages(messages) {
+  let unusedIdentifiers = messages
+    .filter(item => item.ruleId === "no-unused-vars")
+    .filter(item => item.source.trim().startsWith("import "))
+    .map(_errorToIdentifier)
+    .filter(identifier => identifier !== false);
+
+  // const missedReact =
+  //   messages.filter(item => item.ruleId === "react/react-in-jsx-scope")
+  //     .length === 0;
+
+  // if (missedReact) {
+  //   remove(unusedIdentifiers, item => item === "React");
+  // }
+
+  // console.log(unusedIdentifiers);
+  return uniq(unusedIdentifiers);
+}
+
+/**
+ * @deprecated Use getErrorIdentifiers() instead
+ *
+ * @param {string} code
+ */
+export function getUndefinedIdentifier(code: string): string[] {
+  const out = cli.executeOnText(code);
+  const messages = flatMap(out.results, results => results.messages);
+  // console.log(messages);
+
+  return _getUndefineIdentifierFromMessages(messages);
+}
+
+/**
+ * Get undefined and unused identifiers
+ */
+// export function getErrorIdentifiers(code: string): Object {
+//   const out = cli.executeOnText(code);
+//   const messages = flatMap(out.results, results => results.messages);
+//   console.log(messages);
+
+//   let undefinedIdentifiers = _getUndefineIdentifierFromMessages(messages);
+//   let unusedIdentifiers = _getUnusedImportIdentifierFromMessages(messages);
+
+//   return {
+//     undefined: undefinedIdentifiers,
+//     unused: unusedIdentifiers,
+//   };
+// }

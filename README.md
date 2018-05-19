@@ -12,6 +12,7 @@
 * Support ES module import and Flow import
 * Sort imports
 * Disable autoimport for file: `// autoimport-disable`
+* Auto remove unused imports
 
 Sample config file (`autoimport.json`)
 
@@ -20,17 +21,13 @@ Sample config file (`autoimport.json`)
   "packages": {
     "react": {
       "main": "React",
-      "others": [
-        "Component"
-      ]
+      "others": ["Component"]
     },
     "react-dom": {
       "main": "ReactDOM"
     }
   },
-  "ignore": [
-    "window", "document", "JSON"
-  ],
+  "ignore": ["window", "document", "JSON"],
   "rootPath": ""
 }
 ```
@@ -42,8 +39,6 @@ TBD
 # TODO
 
 * Handle updating export
-* Remove unused import
-* Use eslint API to detect undefined identifier (https://eslint.org/docs/developer-guide/nodejs-api, https://github.com/eslint/eslint/blob/master/lib/rules/no-undef.js)
 * Support ignore folders (like `build` folder created by CRA)
 * Add test for VSCode
 * Add travis test for VSCode
