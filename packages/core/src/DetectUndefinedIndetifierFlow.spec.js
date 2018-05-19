@@ -3,7 +3,7 @@ import { codeBuilder } from "./DetectUndefinedIdentifierTestUtils";
 describe("Detect Undefined Identifier for Flow Type", () => {
   const { code, codeFile } = codeBuilder(
     "DetectUndefinedIdentifierFlow",
-    "default",
+    "default"
   );
 
   // it("_DebugUndefinedIdentifier", () => {

@@ -12,7 +12,7 @@
     "eslint-plugin-import": "2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.3.0",
-    "jscodeshift": "^0.3.32",
+    "jscodeshift": "0.5.0",
     "lodash": "4.17.4",
     "minimist": "^1.2.0",
     "recast": "0.12.6"
@@ -39,13 +39,7 @@
     "shelljs": "^0.7.8"
   },
   "jest": {
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/lib/",
-      "/tmp/"
-    ],
-    "setupFiles": [
-      "./src/setupTests.js"
-    ]
+    "testPathIgnorePatterns": ["/node_modules/", "/lib/", "/tmp/"],
+    "setupFiles": ["./src/setupTests.js"]
   }
 }

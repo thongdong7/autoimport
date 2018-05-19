@@ -1,14 +1,17 @@
 import fs from "fs";
 import path from "path";
-import { prepareJscodeshift } from "./utils/jscodeshift";
+import { getUndefinedIdentifier } from "./DetectUndefESLint";
 import DetectUndefinedIdentifier, {
   removeImportIdentifiers,
 } from "./DetectUndefinedIdentifier";
-import { getUndefinedIdentifier } from "./DetectUndefESLint";
+import { prepareJscodeshift } from "./utils/jscodeshift";
 
 type TFNResult = {
   identifiers: string[],
   types: string[],
+  unusedImports: string[],
+  ast: any,
+  jscodeshift: any,
 };
 type TFN = (source: string) => TFNResult;
 
@@ -27,6 +30,9 @@ const eslintFN: TFN = source => {
   return {
     identifiers,
     types: [],
+    unusedImports: [],
+    ast: null,
+    jscodeshift: null,
   };
 };
 
@@ -39,7 +45,7 @@ export function codeBuilder(folder: string, detector: "default" | "eslint") {
   function codeFile(file: string) {
     const content = fs
       .readFileSync(
-        path.join(__dirname, `../__testfixtures__/${folder}/${file}.js`),
+        path.join(__dirname, `../__testfixtures__/${folder}/${file}.js`)
       )
       .toString();
 
