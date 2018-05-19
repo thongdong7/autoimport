@@ -234,9 +234,9 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-autoimport@^0.0.44:
-  version "0.0.44"
-  resolved "https://registry.yarnpkg.com/autoimport/-/autoimport-0.0.44.tgz#2c685c52bf9068be0d730f628cf00bcba6df1e3b"
+autoimport@^0.0.57:
+  version "0.0.57"
+  resolved "https://registry.yarnpkg.com/autoimport/-/autoimport-0.0.57.tgz#23acacbfc5e053ccbe3b5d24a5bf46e80b1ee107"
   dependencies:
     babel-eslint "^7.2.3"
     chalk "2.1.0"
