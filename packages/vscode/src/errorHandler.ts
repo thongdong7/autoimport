@@ -7,9 +7,9 @@ import {
   commands,
   window,
   languages,
-} from 'vscode';
+} from "vscode";
 
-import { onWorkspaceRootChange } from './utils';
+import { onWorkspaceRootChange } from "./utils";
 
 let statusBarItem: StatusBarItem;
 let outputChannel: OutputChannel;
@@ -21,17 +21,12 @@ function toggleStatusBarItem(editor: TextEditor): void {
     // It also triggers when we focus on the output panel or on the debug panel
     // Both are seen as an "editor".
     // The following check will ignore such panels
-    if (
-      ['debug', 'output'].some(
-        part => editor.document.uri.scheme === part
-      )
-    ) {
+    if (["debug", "output"].some(part => editor.document.uri.scheme === part)) {
       return;
     }
 
     const score = languages.match("javascript", editor.document);
-    console.log('score', score);
-
+    console.log("score", score);
 
     if (score > 0) {
       statusBarItem.show();
@@ -75,10 +70,10 @@ function updateStatusBar(message: string): void {
 * @returns {string} enhanced message with the filename
 */
 function addFilePath(msg: string, fileName: string): string {
-  const lines = msg.split('\n');
+  const lines = msg.split("\n");
   if (lines.length > 0) {
     lines[0] = lines[0].replace(/(\d*):(\d*)/g, `${fileName}:$1:$2`);
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
   return msg;
@@ -93,7 +88,7 @@ export function addToOutput(message: string): void {
 
   // Create a sort of title, to differentiate between messages
   outputChannel.appendLine(title);
-  outputChannel.appendLine('-'.repeat(title.length));
+  outputChannel.appendLine("-".repeat(title.length));
 
   // Append actual output
   outputChannel.appendLine(`${message}\n`);
@@ -119,12 +114,12 @@ export function safeExecution(
   try {
     const returnValue = cb();
 
-    updateStatusBar('AutoImport: $(check)');
+    updateStatusBar("AutoImport: $(check)");
 
     return returnValue;
   } catch (err) {
     addToOutput(addFilePath(err.message, fileName));
-    updateStatusBar('AutoImport: $(x)');
+    updateStatusBar("AutoImport: $(x)");
 
     return defaultText;
   }
@@ -133,13 +128,13 @@ export function safeExecution(
 export function setupChannel() {
   // Setup the statusBarItem
   statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, -1);
-  statusBarItem.text = 'AutoImport';
-  statusBarItem.command = 'autoimport.open-output';
+  statusBarItem.text = "AutoImport";
+  statusBarItem.command = "autoimport.open-output";
 
   toggleStatusBarItem(window.activeTextEditor);
 
   // Setup the outputChannel
-  outputChannel = window.createOutputChannel('AutoImport');
+  outputChannel = window.createOutputChannel("AutoImport");
 }
 
 /**
@@ -149,7 +144,7 @@ export function setupChannel() {
 * @returns {Disposable} The command to open the output channel
 */
 export function setupErrorHandler(): Disposable {
-  return commands.registerCommand('autoimport.open-output', () => {
+  return commands.registerCommand("autoimport.open-output", () => {
     outputChannel.show();
   });
 }

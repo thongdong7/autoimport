@@ -1,0 +1,9 @@
+{
+  "packages": {},
+  "ignore": [
+    "window",
+    "document",
+    "JSON"
+  ],
+  "rootPath": "packages/core/src"
+}
