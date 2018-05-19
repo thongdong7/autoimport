@@ -1,5 +1,9 @@
 // @flow
+// autoimport-disable
 
+import fs from "fs";
+import path from "path";
+import { flatMap } from "lodash";
 import type {
   TMemberInfo,
   TImportInfo,
@@ -7,12 +11,9 @@ import type {
   TNormalizedOptions,
   TPackagesOption,
 } from "./types";
-import fs from "fs";
-import path from "path";
-import { flatMap } from "lodash";
 
 const _parseIdentifierNameOfOtherPattern = new RegExp(
-  "^(\\S+)\\s+as\\s+(\\S+)$",
+  "^(\\S+)\\s+as\\s+(\\S+)$"
 );
 export function parseIdentifierNameOfOther(otherStr: string) {
   const result = _parseIdentifierNameOfOtherPattern.exec(otherStr);
@@ -34,7 +35,7 @@ function _getNodeModulesForMemberFolder(detectFolder, memberFolder): string {
   const fullMemberFolder = path.join(
     detectFolder,
     "node_modules",
-    memberFolder,
+    memberFolder
   );
 
   if (!fs.existsSync(fullMemberFolder)) {
@@ -72,7 +73,7 @@ export default class Config {
     this._memberMap = {};
   }
 
-  static fromCache(cache) {
+  static fromCache(cache: Config) {
     const c = new Config(cache.options);
     c._memberMap = cache._memberMap;
 
@@ -108,7 +109,9 @@ export default class Config {
     // Only accept the member not declared in ignore
     if (this.options.ignore.indexOf(member) < 0) {
       if (!this._memberMap[member]) {
+        /* eslint-disable no-console */
         console.warn("there is no member", member);
+        /* eslint-enable no-console */
       }
       return this._memberMap[member];
     } else {
@@ -157,7 +160,7 @@ export default class Config {
     // console.log("p", p, this.packages);
     const tmp = this._getMemberInfosFromImportInfo(
       package_,
-      this.packages[package_],
+      this.packages[package_]
     );
     // console.log("tmp", tmp);
     for (const member of Object.keys(tmp)) {
@@ -183,7 +186,7 @@ export default class Config {
 
   applyPackagesDiff = (
     packages: TPackagesOption,
-    { removed, added, replaced }: TOptionPackageDiff,
+    { removed, added, replaced }: TOptionPackageDiff
   ) => {
     // Remove packages
     removed.forEach(this._removePackage);
@@ -212,7 +215,7 @@ export default class Config {
       // console.log(detectFolders);
       const fullMemberFolders = detectFolders
         .map(detectFolder =>
-          _getNodeModulesForMemberFolder(detectFolder, memberFolder),
+          _getNodeModulesForMemberFolder(detectFolder, memberFolder)
         )
         .filter(f => f !== "");
 

@@ -1,12 +1,13 @@
 // @flow
+/* eslint-disable */
 import { difference, uniq } from "lodash";
 import recast from "recast";
-import { withQueryTransform, isIdentifier, compose } from "./utils/Query";
 import { detectFlowType } from "./DetectFlowType";
-import { detectIdentifiers, STOP_PROCESS } from "./utils/Detect";
-import type { TAST } from "./types";
-import { htmlTags } from "./utils/HTMLTags";
 import { getUndefinedIdentifier } from "./DetectUndefESLint";
+import { detectIdentifiers, STOP_PROCESS } from "./utils/Detect";
+import { htmlTags } from "./utils/HTMLTags";
+import { withQueryTransform, isIdentifier, compose } from "./utils/Query";
+import type { TAST } from "./types";
 
 const types = recast.types.namedTypes;
 
@@ -140,7 +141,7 @@ let ObjectExpressionIdentifier = withQueryTransform({
     ...node.properties
       .filter(
         item =>
-          item.type === "Property" && isIdentifier(item.key) && item.computed,
+          item.type === "Property" && isIdentifier(item.key) && item.computed
       )
       .map(item => item.key.name),
   ],
@@ -294,7 +295,7 @@ const parentMissedIdentifier = ast => {
     JSXExpressionContainer,
     VariableDeclarator2,
     Property2,
-    JSXIdentifier,
+    JSXIdentifier
     // ClassExtendsGenericType
     // BinaryExpression2
   );
@@ -367,7 +368,11 @@ function getUnusedImports(ast) {
   return [...unusedImports.values()];
 }
 
-export function removeImportIdentifiers(j, ast, unusedImports) {
+export function removeImportIdentifiers(
+  j: any,
+  ast: TAST,
+  unusedImports: string[]
+) {
   ast.find(types.ImportDeclaration).forEach(path => {
     if (path.node.specifiers.length > 0) {
       // console.log("unusedImports", unusedImports);
