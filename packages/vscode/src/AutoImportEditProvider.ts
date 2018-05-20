@@ -33,7 +33,7 @@ function format(
   configProvider: ConfigProvider,
   text: string,
   { fileName, languageId }: TextDocument,
-  customOptions: object,
+  customOptions: object
 ): string {
   console.log("call format", fileName);
 
@@ -61,7 +61,7 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
     // Load options
     this.configProvider = new ConfigProvider();
 
-    this.loadConfig();
+    // this.loadConfig();
     // console.log("pp", projectPaths);
   }
 
@@ -80,8 +80,8 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
       .map(
         ({ hasJSONConfigFile, memberFolders, numberIdentifiers }) =>
           `JSONConfig: ${hasJSONConfigFile}\nmemberFolders: ${memberFolders.join(
-            "\n",
-          )}\nIdentifiers: ${numberIdentifiers}`,
+            "\n"
+          )}\nIdentifiers: ${numberIdentifiers}`
       )
       .join("\n");
 
@@ -97,12 +97,12 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
   provideDocumentFormattingEdits(
     document: TextDocument,
     options: FormattingOptions,
-    token: CancellationToken,
+    token: CancellationToken
   ): TextEdit[] {
     return [
       TextEdit.replace(
         fullDocumentRange(document),
-        format(this.configProvider, document.getText(), document, {}),
+        format(this.configProvider, document.getText(), document, {})
       ),
     ];
   }

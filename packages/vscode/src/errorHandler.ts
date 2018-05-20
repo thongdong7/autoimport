@@ -49,6 +49,12 @@ export function registerDisposables(): Disposable[] {
         toggleStatusBarItem(editor);
       }
     }),
+
+    // Command to show output channel
+    // TODO consider to remove it
+    commands.registerCommand("autoimport.open-output", () => {
+      outputChannel.show();
+    }),
   ];
 }
 
@@ -143,8 +149,8 @@ export function setupChannel() {
 * 
 * @returns {Disposable} The command to open the output channel
 */
-export function setupErrorHandler(): Disposable {
-  return commands.registerCommand("autoimport.open-output", () => {
-    outputChannel.show();
-  });
-}
+// export function setupErrorHandler(): Disposable {
+//   return commands.registerCommand("autoimport.open-output", () => {
+//     outputChannel.show();
+//   });
+// }

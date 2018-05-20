@@ -7,16 +7,12 @@ import {
   TextDocument,
   languages,
   workspace,
-  Uri
+  Uri,
 } from "vscode";
 import * as path from "path";
 import EditProvider from "./AutoImportEditProvider";
 import * as fs from "fs";
-import {
-  setupChannel,
-  setupErrorHandler,
-  registerDisposables
-} from "./errorHandler";
+import { setupChannel, registerDisposables } from "./errorHandler";
 
 export function activate(context: ExtensionContext) {
   setupChannel();
@@ -63,7 +59,6 @@ export function activate(context: ExtensionContext) {
       "javascript",
       editProvider
     ),
-    setupErrorHandler(),
     ...registerDisposables(),
     disposable
   );
