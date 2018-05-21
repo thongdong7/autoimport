@@ -1,6 +1,6 @@
 // @flow
-import { flatMap, uniq, remove } from "lodash";
 import { CLIEngine } from "eslint";
+import { flatMap, uniq } from "lodash";
 import { builtinGlobal } from "./utils/BuiltinIdentifiers";
 
 const cli = new CLIEngine({
@@ -67,8 +67,7 @@ function _errorToIdentifier(item: { message: string, source: string }) {
 function _getUndefineIdentifierFromMessages(messages) {
   let undefinedIdentifiers = messages
     .filter(
-      item =>
-        item.ruleId === "no-undef" || item.ruleId === "react/jsx-no-undef",
+      item => item.ruleId === "no-undef" || item.ruleId === "react/jsx-no-undef"
     )
     .map(_errorToIdentifier)
     .filter(identifier => identifier !== false);
@@ -85,25 +84,6 @@ function _getUndefineIdentifierFromMessages(messages) {
   return uniq(undefinedIdentifiers);
 }
 
-function _getUnusedImportIdentifierFromMessages(messages) {
-  let unusedIdentifiers = messages
-    .filter(item => item.ruleId === "no-unused-vars")
-    .filter(item => item.source.trim().startsWith("import "))
-    .map(_errorToIdentifier)
-    .filter(identifier => identifier !== false);
-
-  // const missedReact =
-  //   messages.filter(item => item.ruleId === "react/react-in-jsx-scope")
-  //     .length === 0;
-
-  // if (missedReact) {
-  //   remove(unusedIdentifiers, item => item === "React");
-  // }
-
-  // console.log(unusedIdentifiers);
-  return uniq(unusedIdentifiers);
-}
-
 /**
  * @deprecated Use getErrorIdentifiers() instead
  *
@@ -114,22 +94,12 @@ export function getUndefinedIdentifier(code: string): string[] {
   const messages = flatMap(out.results, results => results.messages);
   // console.log(messages);
 
+  // try {
   return _getUndefineIdentifierFromMessages(messages);
+  // } catch (e) {
+  //   /* eslint-disable no-console */
+  //   console.log(e);
+  //   /* eslint-enable no-console */
+  //   return [];
+  // }
 }
-
-/**
- * Get undefined and unused identifiers
- */
-// export function getErrorIdentifiers(code: string): Object {
-//   const out = cli.executeOnText(code);
-//   const messages = flatMap(out.results, results => results.messages);
-//   console.log(messages);
-
-//   let undefinedIdentifiers = _getUndefineIdentifierFromMessages(messages);
-//   let unusedIdentifiers = _getUnusedImportIdentifierFromMessages(messages);
-
-//   return {
-//     undefined: undefinedIdentifiers,
-//     unused: unusedIdentifiers,
-//   };
-// }
