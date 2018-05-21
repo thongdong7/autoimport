@@ -31,13 +31,22 @@ export function activate(context: ExtensionContext) {
   // Watch js files
   let jsFileWatcher = workspace.createFileSystemWatcher("**/**/*.js");
   let jsFileUpdate = async (e: Uri) => {
-    console.log("js file change1", e.fsPath);
+    console.log("file change", e.fsPath);
     editProvider.configProvider.addFile(
       e.fsPath,
       fs.readFileSync(e.fsPath).toString()
     );
   };
   jsFileWatcher.onDidChange(jsFileUpdate);
+
+  let jsFileDelete = async (e: Uri) => {
+    console.log("file delete", e.fsPath);
+    // editProvider.configProvider.addFile(
+    //   e.fsPath,
+    //   fs.readFileSync(e.fsPath).toString()
+    // );
+  };
+  jsFileWatcher.onDidDelete(jsFileDelete);
 
   // optionFileWatcher.onDidCreate(optionFileUpdate);
   // optionFileWatcher.onDidDelete(async (e) => {
@@ -62,6 +71,8 @@ export function activate(context: ExtensionContext) {
     ...registerDisposables(),
     disposable
   );
+
+  editProvider.loadConfig();
 }
 
 // this method is called when your extension is deactivated
