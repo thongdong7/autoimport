@@ -1,6 +1,6 @@
 // @flow
-import { flatMap, uniq, remove } from "lodash";
 import { CLIEngine } from "eslint";
+import { flatMap, uniq } from "lodash";
 import { builtinGlobal } from "./utils/BuiltinIdentifiers";
 
 const cli = new CLIEngine({
@@ -67,8 +67,7 @@ function _errorToIdentifier(item: { message: string, source: string }) {
 function _getUndefineIdentifierFromMessages(messages) {
   let undefinedIdentifiers = messages
     .filter(
-      item =>
-        item.ruleId === "no-undef" || item.ruleId === "react/jsx-no-undef",
+      item => item.ruleId === "no-undef" || item.ruleId === "react/jsx-no-undef"
     )
     .map(_errorToIdentifier)
     .filter(identifier => identifier !== false);
