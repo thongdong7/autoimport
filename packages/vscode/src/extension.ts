@@ -15,7 +15,7 @@ import * as fs from "fs";
 import { setupChannel, registerDisposables } from "./errorHandler";
 
 export function activate(context: ExtensionContext) {
-  setupChannel();
+  setupChannel(context);
 
   const editProvider = new EditProvider();
 
@@ -72,7 +72,8 @@ export function activate(context: ExtensionContext) {
     disposable
   );
 
-  editProvider.loadConfig();
+  setTimeout(editProvider.loadConfig, 1000);
+  // editProvider.loadConfig();
 }
 
 // this method is called when your extension is deactivated

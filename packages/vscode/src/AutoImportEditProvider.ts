@@ -8,7 +8,7 @@ import {
   workspace,
 } from "vscode";
 import ConfigProvider from "autoimport/lib/ConfigProvider";
-import { safeExecution, addToOutput } from "./errorHandler";
+import { safeExecution, addToOutput, updateStatusBar } from "./errorHandler";
 import { onWorkspaceRootChange } from "./utils";
 import { requireLocalPkg } from "./requirePkg";
 
@@ -54,6 +54,10 @@ function prettierFormat(fileName: string, text: string): string {
   return prettier.format(text, prettierOptions);
 }
 
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 class AutoImportEditProvider implements DocumentFormattingEditProvider {
   configProvider: ConfigProvider;
 
@@ -65,9 +69,14 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
     // console.log("pp", projectPaths);
   }
 
-  loadConfig = () => {
+  loadConfig = async () => {
     console.time("load config");
     addToOutput("Load config");
+    updateStatusBar("AI: loading...");
+
+    // Await is help to show loading in status bar
+    await timeout(1);
+
     const workspaceFolders = workspace.workspaceFolders || [];
     const projectPaths = workspaceFolders
       .filter(item => item.uri.scheme === "file")
@@ -87,6 +96,7 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
 
     console.timeEnd("load config");
     addToOutput(`All config is loaded: ${output}`);
+    updateStatusBar("AI: done");
   };
 
   updateOptionFile = (file: string) => {

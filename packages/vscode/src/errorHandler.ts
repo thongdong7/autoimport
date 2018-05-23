@@ -1,4 +1,5 @@
 import {
+  ExtensionContext,
   Disposable,
   StatusBarItem,
   OutputChannel,
@@ -63,7 +64,8 @@ export function registerDisposables(): Disposable[] {
 * 
 * @param message The message to put inside the statusBarItem
 */
-function updateStatusBar(message: string): void {
+export function updateStatusBar(message: string): void {
+  console.log(`update status bar: ${message}`);
   statusBarItem.text = message;
   statusBarItem.show();
 }
@@ -90,19 +92,9 @@ function addFilePath(msg: string, fileName: string): string {
 * @param message The message to append to the output channel
 */
 export function addToOutput(message: string): void {
-  const title = `${new Date().toLocaleString()}:`;
+  const title = new Date().toLocaleString();
 
-  // Create a sort of title, to differentiate between messages
-  outputChannel.appendLine(title);
-  outputChannel.appendLine("-".repeat(title.length));
-
-  // Append actual output
-  outputChannel.appendLine(`${message}\n`);
-
-  if (outputChannelOpen === false) {
-    outputChannel.show(true);
-    outputChannelOpen = true;
-  }
+  outputChannel.appendLine(`${title}: ${message}`);
 }
 /**
 * Execute a callback safely, if it doesn't work, return default and log messages.
@@ -131,15 +123,20 @@ export function safeExecution(
   }
 }
 
-export function setupChannel() {
+export function setupChannel(context: ExtensionContext) {
   // Setup the statusBarItem
+  console.error("setup c1");
   statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, -1);
   statusBarItem.text = "AutoImport";
   statusBarItem.command = "autoimport.open-output";
+  context.subscriptions.push(statusBarItem);
 
+  console.error("setup c2");
+  console.error(window.activeTextEditor);
   toggleStatusBarItem(window.activeTextEditor);
 
   // Setup the outputChannel
+  console.error("setup c3");
   outputChannel = window.createOutputChannel("AutoImport");
 }
 
