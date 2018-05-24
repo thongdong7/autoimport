@@ -10,7 +10,10 @@ import {
   Uri,
 } from "vscode";
 import * as path from "path";
-import EditProvider from "./AutoImportEditProvider";
+import EditProvider, {
+  loadConfig,
+  getConfigProvider,
+} from "./AutoImportEditProvider";
 import * as fs from "fs";
 import { setupChannel, registerDisposables } from "./errorHandler";
 
@@ -32,10 +35,7 @@ export function activate(context: ExtensionContext) {
   let jsFileWatcher = workspace.createFileSystemWatcher("**/**/*.js");
   let jsFileUpdate = async (e: Uri) => {
     console.log("file change", e.fsPath);
-    editProvider.configProvider.addFile(
-      e.fsPath,
-      fs.readFileSync(e.fsPath).toString()
-    );
+    getConfigProvider().addFile(e.fsPath, fs.readFileSync(e.fsPath).toString());
   };
   jsFileWatcher.onDidChange(jsFileUpdate);
 
@@ -59,7 +59,7 @@ export function activate(context: ExtensionContext) {
   var disposable = commands.registerCommand(
     "extension.autoimportRescan",
     () => {
-      editProvider.loadConfig();
+      loadConfig();
     }
   );
 
@@ -72,7 +72,7 @@ export function activate(context: ExtensionContext) {
     disposable
   );
 
-  setTimeout(editProvider.loadConfig, 1000);
+  setTimeout(loadConfig, 1000);
   // editProvider.loadConfig();
 }
 

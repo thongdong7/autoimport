@@ -8,7 +8,13 @@ import {
   workspace,
 } from "vscode";
 import ConfigProvider from "autoimport/lib/ConfigProvider";
-import { safeExecution, addToOutput, updateStatusBar } from "./errorHandler";
+import {
+  safeExecution,
+  addToOutput,
+  updateStatusBar,
+  showDone,
+  showLoading,
+} from "./errorHandler";
 import { onWorkspaceRootChange } from "./utils";
 import { requireLocalPkg } from "./requirePkg";
 
@@ -38,6 +44,7 @@ function format(
   console.log("call format", fileName);
 
   addToOutput(`Call format ${fileName}`);
+  // showLoading();
   let autoImportedText = configProvider.formatFile(fileName, text);
 
   // Call prettier
@@ -45,6 +52,7 @@ function format(
   autoImportedText = prettierFormat(fileName, autoImportedText);
 
   addToOutput(`Format document done`);
+  // showDone();
   return autoImportedText;
 }
 
@@ -58,50 +66,53 @@ function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-class AutoImportEditProvider implements DocumentFormattingEditProvider {
-  configProvider: ConfigProvider;
+let configProvider: ConfigProvider;
 
-  constructor() {
-    // Load options
-    this.configProvider = new ConfigProvider();
+export async function loadConfig() {
+  if (configProvider == null) {
+    configProvider = new ConfigProvider();
+  }
+  console.time("load config");
+  addToOutput("Load config");
+  // updateStatusBar("AutoImport: aaa");
 
-    // this.loadConfig();
-    // console.log("pp", projectPaths);
+  // Await is help to show loading in status bar
+  // await timeout(1);
+
+  const workspaceFolders = workspace.workspaceFolders || [];
+  const projectPaths = workspaceFolders
+    .filter(item => item.uri.scheme === "file")
+    .map(item => item.uri.fsPath);
+
+  configProvider.updateProjectPaths(projectPaths);
+  const results = configProvider.getAutoImportStatus();
+
+  const output = results
+    .map(
+      ({ hasJSONConfigFile, memberFolders, numberIdentifiers }) =>
+        `JSONConfig: ${hasJSONConfigFile}\nmemberFolders: ${memberFolders.join(
+          "\n"
+        )}\nIdentifiers: ${numberIdentifiers}`
+    )
+    .join("\n");
+
+  console.timeEnd("load config");
+  addToOutput(`All config is loaded: ${output}`);
+  showDone();
+}
+
+export function getConfigProvider() {
+  if (configProvider == null) {
+    configProvider = new ConfigProvider();
   }
 
-  loadConfig = async () => {
-    console.time("load config");
-    addToOutput("Load config");
-    updateStatusBar("AI: loading...");
+  return configProvider;
+}
 
-    // Await is help to show loading in status bar
-    await timeout(1);
-
-    const workspaceFolders = workspace.workspaceFolders || [];
-    const projectPaths = workspaceFolders
-      .filter(item => item.uri.scheme === "file")
-      .map(item => item.uri.fsPath);
-
-    this.configProvider.updateProjectPaths(projectPaths);
-    const results = this.configProvider.getAutoImportStatus();
-
-    const output = results
-      .map(
-        ({ hasJSONConfigFile, memberFolders, numberIdentifiers }) =>
-          `JSONConfig: ${hasJSONConfigFile}\nmemberFolders: ${memberFolders.join(
-            "\n"
-          )}\nIdentifiers: ${numberIdentifiers}`
-      )
-      .join("\n");
-
-    console.timeEnd("load config");
-    addToOutput(`All config is loaded: ${output}`);
-    updateStatusBar("AI: done");
-  };
-
+class AutoImportEditProvider implements DocumentFormattingEditProvider {
   updateOptionFile = (file: string) => {
     addToOutput("Update option file");
-    this.configProvider.updateOptionFile(file);
+    configProvider.updateOptionFile(file);
   };
 
   provideDocumentFormattingEdits(
@@ -112,7 +123,7 @@ class AutoImportEditProvider implements DocumentFormattingEditProvider {
     return [
       TextEdit.replace(
         fullDocumentRange(document),
-        format(this.configProvider, document.getText(), document, {})
+        format(getConfigProvider(), document.getText(), document, {})
       ),
     ];
   }

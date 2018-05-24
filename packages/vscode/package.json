@@ -31,7 +31,8 @@
     "test": "node ./node_modules/vscode/bin/test"
   },
   "dependencies": {
-    "autoimport": "^0.0.66",
+    "autoimport": "^0.0.64",
+    "elegant-spinner": "^1.0.1",
     "prettier": "1.6.1",
     "prettier-eslint": "^6.4.2",
     "read-pkg-up": "2.0.0",

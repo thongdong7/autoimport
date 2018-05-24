@@ -11,10 +11,27 @@ import {
 } from "vscode";
 
 import { onWorkspaceRootChange } from "./utils";
+import * as elegantSpinner from "elegant-spinner";
 
 let statusBarItem: StatusBarItem;
 let outputChannel: OutputChannel;
 let outputChannelOpen: Boolean = false;
+
+let loadingHandler;
+
+const frame = elegantSpinner();
+
+export function showLoading() {
+  statusBarItem.text = `AutoImport: ${frame()}`;
+
+  loadingHandler = setInterval(function() {
+    statusBarItem.text = `AutoImport: ${frame()}`;
+  }, 50);
+}
+
+export function showDone() {
+  updateStatusBar("AutoImport: $(check)");
+}
 
 function toggleStatusBarItem(editor: TextEditor): void {
   if (editor !== undefined) {
@@ -66,8 +83,13 @@ export function registerDisposables(): Disposable[] {
 */
 export function updateStatusBar(message: string): void {
   console.log(`update status bar: ${message}`);
+  if (loadingHandler) {
+    clearInterval(loadingHandler);
+    loadingHandler = null;
+  }
+
   statusBarItem.text = message;
-  statusBarItem.show();
+  // statusBarItem.show();
 }
 
 /**
@@ -126,17 +148,22 @@ export function safeExecution(
 export function setupChannel(context: ExtensionContext) {
   // Setup the statusBarItem
   console.error("setup c1");
-  statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, -1);
-  statusBarItem.text = "AutoImport";
+  statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right);
+
+  // Set loading status now because if not affect when set at "load config" phase
+  // statusBarItem.text = "AutoImport: $(watch)";
   statusBarItem.command = "autoimport.open-output";
   context.subscriptions.push(statusBarItem);
+  statusBarItem.show();
 
-  console.error("setup c2");
-  console.error(window.activeTextEditor);
-  toggleStatusBarItem(window.activeTextEditor);
+  showLoading();
+
+  // console.error("setup c2");
+  // console.error(window.activeTextEditor);
+  // toggleStatusBarItem(window.activeTextEditor);
 
   // Setup the outputChannel
-  console.error("setup c3");
+  // console.error("setup c3");
   outputChannel = window.createOutputChannel("AutoImport");
 }
 
