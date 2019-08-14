@@ -3,13 +3,13 @@
 /**
  * Scan source root to get exports
  */
-import type { TImportInfo } from "../types";
-import { withQueryTransform, isIdentifier } from "./Query";
-import recast from "recast";
-import type { TPackagesOption } from "../types";
 import fs from "fs";
 import path from "path";
+import recast from "recast";
 import { prepareJscodeshift } from "./jscodeshift";
+import { withQueryTransform, isIdentifier } from "./Query";
+import type { TImportInfo } from "../types";
+import type { TPackagesOption } from "../types";
 
 const j = prepareJscodeshift();
 
@@ -95,7 +95,11 @@ function* _getFiles(dir: string) {
   // There is no node_modules in rootPath (src folder)
   const dirName = path.basename(dir);
   // TODO Fix this hard-code (for ignore `build` dir)
-  if (dirName === "node_modules" || dirName === "build") {
+  if (
+    dirName === "node_modules" ||
+    dirName === "build" ||
+    dirName.startsWith(".")
+  ) {
     return;
   }
 
@@ -107,6 +111,25 @@ function* _getFiles(dir: string) {
       yield fullPath;
     }
   }
+  // fs.readdir(dir, (err, files) => {
+  //   for (const file of files) {
+  //     const fullPath = path.join(dir, file);
+  //     if (fs.lstatSync(fullPath).isDirectory()) {
+  //       yield* _getFiles(fullPath);
+  //     } else {
+  //       yield fullPath;
+  //     }
+  //   }
+  // })
+
+  // for (const file of fs.readdirSync(dir)) {
+  //   const fullPath = path.join(dir, file);
+  //   if (fs.lstatSync(fullPath).isDirectory()) {
+  //     yield* _getFiles(fullPath);
+  //   } else {
+  //     yield fullPath;
+  //   }
+  // }
 }
 
 export function scanSourceDir(rootPath: string): TPackagesOption {

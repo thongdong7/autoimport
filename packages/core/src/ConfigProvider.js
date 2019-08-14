@@ -90,14 +90,14 @@ export class ProjectConfigProvider {
           source: text,
         },
         api,
-        this,
+        this
       );
     };
 
     return Text2Text;
   };
 
-  loadOptionFile = (file: string) => {
+  loadOptionFile = async (file: string) => {
     this.file = file;
     this.projectPath = path.dirname(file);
 
@@ -127,7 +127,7 @@ export class ProjectConfigProvider {
 
     if (!this.scaned) {
       const packagesFromSource = scanSourceDir(
-        path.join(genOptions.projectPath, genOptions.rootPath),
+        path.join(genOptions.projectPath, genOptions.rootPath)
       );
 
       genOptions = {
@@ -194,7 +194,7 @@ export class ProjectConfigProvider {
   addFile = (fullPath: string, content: string): void => {
     const packageOption: TImportInfo = getExportInfoFromSource(
       fullPath,
-      content,
+      content
     );
 
     const relativePath = path.relative(this.getFullRootPath(), fullPath);
@@ -228,7 +228,7 @@ export class ProjectConfigProvider {
     const cache = this.config.getCache();
     fs.writeFileSync(
       this.projectPath + "/autoimport.json.cache",
-      JSON.stringify(cache, null, 2),
+      JSON.stringify(cache, null, 2)
     );
   };
 }
@@ -241,7 +241,7 @@ export default class ConfigProvider {
     this.projectPaths = projectPaths;
     this.projectConfigs = projectPaths.map(
       projectPath =>
-        new ProjectConfigProvider(path.join(projectPath, "autoimport.json")),
+        new ProjectConfigProvider(path.join(projectPath, "autoimport.json"))
     );
   };
 
@@ -253,8 +253,8 @@ export default class ConfigProvider {
     this.projectPaths = projectPaths;
     this.projectConfigs = projectPaths.map(projectPath =>
       ProjectConfigProvider.fromCache(
-        path.join(projectPath, "autoimport.json.cache"),
-      ),
+        path.join(projectPath, "autoimport.json.cache")
+      )
     );
   };
 
@@ -269,7 +269,7 @@ export default class ConfigProvider {
     }
 
     const matchedPC: ProjectConfigProvider = this.projectConfigs.filter(pc =>
-      pc.containFile(absFile),
+      pc.containFile(absFile)
     )[0];
 
     let result;
@@ -293,7 +293,7 @@ export default class ConfigProvider {
 
   addFile = (fullPath: string, content?: string) => {
     const matchedPC = this.projectConfigs.filter(pc =>
-      pc.containFile(fullPath),
+      pc.containFile(fullPath)
     )[0];
 
     if (matchedPC) {
