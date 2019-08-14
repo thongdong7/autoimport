@@ -2,7 +2,7 @@
   "name": "vscode-autoimport",
   "displayName": "Auto Import for Javascript",
   "description": "Support ES6 and Flowtype",
-  "version": "0.0.67",
+  "version": "0.0.68",
   "publisher": "thongdong7",
   "private": true,
   "repository": {},
